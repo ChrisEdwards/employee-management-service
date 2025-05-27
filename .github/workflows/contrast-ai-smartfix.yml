@@ -53,7 +53,7 @@ jobs:
           build_command: 'mvn clean install'
           max_build_attempts: 6
           # --- Vulnerability Configuration ---
-          vulnerability_severities: '["MEDIUM"]'
+          vulnerability_severities: '["CRITICAL", "HIGH"]'
           # --- Formatting Command ---
           formatting_command: 'mvn spotless:apply'
           # --- GitHub Token ---
