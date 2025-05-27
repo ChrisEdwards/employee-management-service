@@ -379,6 +379,7 @@ def set_vulnerability_status(vuln_uuid: str, status: str, contrast_host: str, co
         "Accept": "application/json"
     }
     payload = {
+        "note": "Contrast AI SmartFix remediated",
         "traces": [vuln_uuid],
         "status": status
     }
