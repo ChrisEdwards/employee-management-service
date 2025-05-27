@@ -2,13 +2,13 @@ package com.example.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.PreparedStatement;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -70,7 +70,7 @@ public class EmployeeServiceTest {
     assertThat(actualUsers.size()).isEqualTo(1);
     assertThat(actualUsers.get(0).getUsername()).isEqualTo("testuser");
     assertThat(actualUsers.get(0).getEmail()).isEqualTo("test@example.com");
-    
+
     // Verify PreparedStatement is used correctly
     verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
     verify(preparedStatement).setString(1, "testuser");
