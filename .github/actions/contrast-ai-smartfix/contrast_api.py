@@ -369,7 +369,7 @@ def add_note_to_vulnerability(vuln_uuid: str, note_content: str, contrast_host: 
         # print("Response text:", response.text, file=sys.stderr) # Be cautious with logging full response
         return False
 
-def set_vulnerability_status(vuln_uuid: str, status: str, contrast_host: str, contrast_org_id: str, contrast_auth_key: str, contrast_api_key: str) -> bool:
+def set_vulnerability_status(vuln_uuid: str, status: str, contrast_host: str, contrast_org_id: str, contrast_auth_key: str, contrast_api_key: str, pr_url: str) -> bool:
     """Sets the status of a specific vulnerability in Contrast."""
     api_url = f"https://{contrast_host}/Contrast/api/ng/{contrast_org_id}/orgtraces/mark"
     headers = {
@@ -379,7 +379,7 @@ def set_vulnerability_status(vuln_uuid: str, status: str, contrast_host: str, co
         "Accept": "application/json"
     }
     payload = {
-        "note": "Contrast AI SmartFix remediated",
+        "note": f"Contrast AI SmartFix remediated ({pr_url if pr_url else 'Unknown URL'})",
         "traces": [vuln_uuid],
         "status": status
     }

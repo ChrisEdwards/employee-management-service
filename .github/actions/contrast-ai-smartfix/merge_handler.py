@@ -105,7 +105,8 @@ def handle_merged_pr():
             contrast_host=config.CONTRAST_HOST,
             contrast_org_id=config.CONTRAST_ORG_ID,
             contrast_auth_key=config.CONTRAST_AUTHORIZATION_KEY,
-            contrast_api_key=config.CONTRAST_API_KEY
+            contrast_api_key=config.CONTRAST_API_KEY,
+            pr_url=pr_url
         )
 
         if status_set:
