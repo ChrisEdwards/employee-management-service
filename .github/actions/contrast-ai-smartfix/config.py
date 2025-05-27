@@ -66,6 +66,7 @@ AGENT_MODEL = get_env_var("AGENT_MODEL", required=False, default="bedrock/anthro
 ATTEMPT_WRITING_SECURITY_TEST = get_env_var("ATTEMPT_WRITING_SECURITY_TEST", required=False, default="false").lower() == "true"
 # --- QA Configuration ---
 SKIP_QA_REVIEW = get_env_var("SKIP_QA_REVIEW", required=False, default="true").lower() == "true"
+SKIP_COMMENTS = get_env_var("SKIP_COMMENTS", required=False, default="false").lower() == "true"
 
 # --- Vulnerability Configuration ---
 # Define the allowlist of valid severity levels
@@ -126,6 +127,7 @@ debug_print(f"Base Branch: {BASE_BRANCH}")
 debug_print(f"Agent Model: {AGENT_MODEL}")
 debug_print(f"Attempt Writing Security Test: {ATTEMPT_WRITING_SECURITY_TEST}")
 debug_print(f"Skip QA Review: {SKIP_QA_REVIEW}") # Added debug print
+debug_print(f"Skip Comments: {SKIP_COMMENTS}")
 debug_print(f"AWS Region: {AWS_REGION}")
 debug_print(f"Vulnerability Severities: {VULNERABILITY_SEVERITIES}")
 if AWS_SESSION_TOKEN:

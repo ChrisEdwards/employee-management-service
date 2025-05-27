@@ -351,20 +351,23 @@ def main():
                     pr_creation_success = True
 
                     # <<< ADDED: Add note to Contrast API >>>
-                    note_content = f"Contrast AI SmartFix opened remediation PR: {pr_url}"
-                    note_added = contrast_api.add_note_to_vulnerability(
-                        vuln_uuid=vuln_uuid,
-                        note_content=note_content,
-                        contrast_host=config.CONTRAST_HOST,
-                        contrast_org_id=config.CONTRAST_ORG_ID,
-                        contrast_app_id=config.CONTRAST_APP_ID, # Ensure CONTRAST_APP_ID is available in config
-                        contrast_auth_key=config.CONTRAST_AUTHORIZATION_KEY,
-                        contrast_api_key=config.CONTRAST_API_KEY
-                    )
-                    if note_added:
-                        print(f"Successfully added note to Contrast for vulnerability {vuln_uuid}.")
+                    if not config.SKIP_COMMENTS:
+                        note_content = f"Contrast AI SmartFix opened remediation PR: {pr_url}"
+                        note_added = contrast_api.add_note_to_vulnerability(
+                            vuln_uuid=vuln_uuid,
+                            note_content=note_content,
+                            contrast_host=config.CONTRAST_HOST,
+                            contrast_org_id=config.CONTRAST_ORG_ID,
+                            contrast_app_id=config.CONTRAST_APP_ID, # Ensure CONTRAST_APP_ID is available in config
+                            contrast_auth_key=config.CONTRAST_AUTHORIZATION_KEY,
+                            contrast_api_key=config.CONTRAST_API_KEY
+                        )
+                        if note_added:
+                            print(f"Successfully added note to Contrast for vulnerability {vuln_uuid}.")
+                        else:
+                            print(f"Warning: Failed to add note to Contrast for vulnerability {vuln_uuid}.")
                     else:
-                        print(f"Warning: Failed to add note to Contrast for vulnerability {vuln_uuid}.")
+                        print(f"Skipping adding note to Contrast due to SKIP_COMMENTS setting.")
                     # <<< END ADDED: Add note to Contrast API >>>
                 else:
                     # This case should ideally be handled by create_pr exiting or returning empty

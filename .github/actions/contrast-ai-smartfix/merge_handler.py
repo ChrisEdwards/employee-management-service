@@ -67,52 +67,55 @@ def handle_merged_pr():
 
     debug_print(f"Extracted Vulnerability UUID: {vuln_uuid}")
     
-    note_content = f"Contrast AI SmartFix merged remediation PR: {pr_url if pr_url else 'Unknown URL'}"
-    
-    # Ensure all necessary config values are loaded/available
-    # These would typically be set as environment variables in the GitHub Actions workflow
-    # and loaded by the config.py module.
-    
-    # Check for essential Contrast configuration
-    if not all([config.CONTRAST_HOST, config.CONTRAST_ORG_ID, config.CONTRAST_APP_ID, config.CONTRAST_AUTHORIZATION_KEY, config.CONTRAST_API_KEY]):
-        print("Error: Missing one or more Contrast API configuration variables (HOST, ORG_ID, APP_ID, AUTH_KEY, API_KEY).", file=sys.stderr)
-        sys.exit(1)
+    if not config.SKIP_COMMENTS:
+        note_content = f"Contrast AI SmartFix merged remediation PR: {pr_url if pr_url else 'Unknown URL'}"
+        
+        # Ensure all necessary config values are loaded/available
+        # These would typically be set as environment variables in the GitHub Actions workflow
+        # and loaded by the config.py module.
+        
+        # Check for essential Contrast configuration
+        if not all([config.CONTRAST_HOST, config.CONTRAST_ORG_ID, config.CONTRAST_APP_ID, config.CONTRAST_AUTHORIZATION_KEY, config.CONTRAST_API_KEY]):
+            print("Error: Missing one or more Contrast API configuration variables (HOST, ORG_ID, APP_ID, AUTH_KEY, API_KEY).", file=sys.stderr)
+            sys.exit(1)
 
-    print(f"Sending note to Contrast for vulnerability {vuln_uuid}...")
-    note_added = contrast_api.add_note_to_vulnerability(
-        vuln_uuid=vuln_uuid,
-        note_content=note_content,
-        contrast_host=config.CONTRAST_HOST,
-        contrast_org_id=config.CONTRAST_ORG_ID,
-        contrast_app_id=config.CONTRAST_APP_ID,
-        contrast_auth_key=config.CONTRAST_AUTHORIZATION_KEY,
-        contrast_api_key=config.CONTRAST_API_KEY
-    )
+        print(f"Sending note to Contrast for vulnerability {vuln_uuid}...")
+        note_added = contrast_api.add_note_to_vulnerability(
+            vuln_uuid=vuln_uuid,
+            note_content=note_content,
+            contrast_host=config.CONTRAST_HOST,
+            contrast_org_id=config.CONTRAST_ORG_ID,
+            contrast_app_id=config.CONTRAST_APP_ID,
+            contrast_auth_key=config.CONTRAST_AUTHORIZATION_KEY,
+            contrast_api_key=config.CONTRAST_API_KEY
+        )
 
-    if note_added:
-        debug_print(f"Successfully added 'merged' note to Contrast for vulnerability {vuln_uuid}.")
+        if note_added:
+            debug_print(f"Successfully added 'merged' note to Contrast for vulnerability {vuln_uuid}.")
+        else:
+            print(f"Warning: Failed to add 'merged' note to Contrast for vulnerability {vuln_uuid}.")
+            # Decide if this should be a failing condition for the action
+            # sys.exit(1) 
+
+        # Set vulnerability status to Remediated
+        print(f"Setting status to 'Remediated' for vulnerability {vuln_uuid}...")
+        status_set = contrast_api.set_vulnerability_status(
+            vuln_uuid=vuln_uuid,
+            status="Remediated",
+            contrast_host=config.CONTRAST_HOST,
+            contrast_org_id=config.CONTRAST_ORG_ID,
+            contrast_auth_key=config.CONTRAST_AUTHORIZATION_KEY,
+            contrast_api_key=config.CONTRAST_API_KEY
+        )
+
+        if status_set:
+            debug_print(f"Successfully set status to 'Remediated' for vulnerability {vuln_uuid}.")
+        else:
+            print(f"Warning: Failed to set status to 'Remediated' for vulnerability {vuln_uuid}.", file=sys.stderr)
+            # Optionally, decide if this should be a failing condition for the action
+            # sys.exit(1)
     else:
-        print(f"Warning: Failed to add 'merged' note to Contrast for vulnerability {vuln_uuid}.")
-        # Decide if this should be a failing condition for the action
-        # sys.exit(1) 
-
-    # Set vulnerability status to Remediated
-    print(f"Setting status to 'Remediated' for vulnerability {vuln_uuid}...")
-    status_set = contrast_api.set_vulnerability_status(
-        vuln_uuid=vuln_uuid,
-        status="Remediated",
-        contrast_host=config.CONTRAST_HOST,
-        contrast_org_id=config.CONTRAST_ORG_ID,
-        contrast_auth_key=config.CONTRAST_AUTHORIZATION_KEY,
-        contrast_api_key=config.CONTRAST_API_KEY
-    )
-
-    if status_set:
-        debug_print(f"Successfully set status to 'Remediated' for vulnerability {vuln_uuid}.")
-    else:
-        print(f"Warning: Failed to set status to 'Remediated' for vulnerability {vuln_uuid}.", file=sys.stderr)
-        # Optionally, decide if this should be a failing condition for the action
-        # sys.exit(1)
+        print("Skipping adding comment and setting status to 'Remediated' due to SKIP_COMMENTS setting.")
 
     # Tag vulnerability as "SmartFix Remediated"
     tag_to_add = "SmartFix Remediated"
