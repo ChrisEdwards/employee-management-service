@@ -24,72 +24,68 @@ import com.example.model.User;
 @SpringBootTest
 public class EmployeeServiceSecurityTest {
 
-    @Mock
-    private DataSource dataSource;
+  @Mock private DataSource dataSource;
 
-    @Mock
-    private Connection connection;
+  @Mock private Connection connection;
 
-    @Mock
-    private PreparedStatement preparedStatement;
+  @Mock private PreparedStatement preparedStatement;
 
-    @Mock
-    private ResultSet resultSet;
+  @Mock private ResultSet resultSet;
 
-    @InjectMocks
-    private EmployeeService employeeService;
+  @InjectMocks private EmployeeService employeeService;
 
-    @BeforeEach
-    public void setup() throws SQLException {
-        MockitoAnnotations.openMocks(this);
+  @BeforeEach
+  public void setup() throws SQLException {
+    MockitoAnnotations.openMocks(this);
 
-        // Configure the mock DataSource
-        when(dataSource.getConnection()).thenReturn(connection);
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+    // Configure the mock DataSource
+    when(dataSource.getConnection()).thenReturn(connection);
+    when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+    when(preparedStatement.executeQuery()).thenReturn(resultSet);
 
-        // Mock the ResultSet to return no results by default
-        when(resultSet.next()).thenReturn(false);
-    }
+    // Mock the ResultSet to return no results by default
+    when(resultSet.next()).thenReturn(false);
+  }
 
-    @Test
-    public void testSqlInjectionAttemptIsHandledSafely() throws SQLException {
-        // Setup
-        String sqlInjectionPayload = "' OR '1'='1";
-        
-        // Configure ResultSet to return a single user (this shouldn't happen with SQL injection)
-        when(resultSet.next()).thenReturn(false);
+  @Test
+  public void testSqlInjectionAttemptIsHandledSafely() throws SQLException {
+    // Setup
+    String sqlInjectionPayload = "' OR '1'='1";
 
-        // Test
-        List<User> results = employeeService.findUserByUsername(sqlInjectionPayload);
+    // Configure ResultSet to return a single user (this shouldn't happen with SQL injection)
+    when(resultSet.next()).thenReturn(false);
 
-        // Verify
-        // The PreparedStatement should be used with setString for the parameter
-        verify(preparedStatement).setString(1, sqlInjectionPayload);
-        
-        // The attack should not return any users
-        assertThat(results).isEmpty();
-    }
+    // Test
+    List<User> results = employeeService.findUserByUsername(sqlInjectionPayload);
 
-    @Test
-    public void testNormalUsernameSearchStillWorks() throws SQLException {
-        // Setup
-        String username = "normaluser";
-        
-        // Configure ResultSet to return a single user
-        when(resultSet.next()).thenReturn(true, false);  // Return true first time, then false to end loop
-        when(resultSet.getLong("id")).thenReturn(1L);
-        when(resultSet.getString("username")).thenReturn(username);
-        when(resultSet.getString("password")).thenReturn("password123");
-        when(resultSet.getString("email")).thenReturn("normal@example.com");
+    // Verify
+    // The PreparedStatement should be used with setString for the parameter
+    verify(preparedStatement).setString(1, sqlInjectionPayload);
 
-        // Test
-        List<User> users = employeeService.findUserByUsername(username);
+    // The attack should not return any users
+    assertThat(results).isEmpty();
+  }
 
-        // Verify
-        verify(preparedStatement).setString(1, username);
-        assertThat(users).isNotEmpty();
-        assertThat(users).hasSize(1);
-        assertThat(users.get(0).getUsername()).isEqualTo(username);
-    }
+  @Test
+  public void testNormalUsernameSearchStillWorks() throws SQLException {
+    // Setup
+    String username = "normaluser";
+
+    // Configure ResultSet to return a single user
+    when(resultSet.next())
+        .thenReturn(true, false); // Return true first time, then false to end loop
+    when(resultSet.getLong("id")).thenReturn(1L);
+    when(resultSet.getString("username")).thenReturn(username);
+    when(resultSet.getString("password")).thenReturn("password123");
+    when(resultSet.getString("email")).thenReturn("normal@example.com");
+
+    // Test
+    List<User> users = employeeService.findUserByUsername(username);
+
+    // Verify
+    verify(preparedStatement).setString(1, username);
+    assertThat(users).isNotEmpty();
+    assertThat(users).hasSize(1);
+    assertThat(users.get(0).getUsername()).isEqualTo(username);
+  }
 }

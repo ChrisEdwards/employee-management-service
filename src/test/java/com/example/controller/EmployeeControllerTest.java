@@ -3,6 +3,7 @@ package com.example.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -54,7 +55,7 @@ public class EmployeeControllerTest {
     assertThat(content).contains("testuser");
     assertThat(content).contains("test@example.com");
   }
-  
+
   @Test
   public void testUserSearchWithSqlInjectionAttempt() throws Exception {
     // Setup - empty list to simulate no injection results
