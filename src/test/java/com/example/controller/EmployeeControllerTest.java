@@ -3,6 +3,7 @@ package com.example.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -53,6 +54,25 @@ public class EmployeeControllerTest {
     String content = result.getResponse().getContentAsString();
     assertThat(content).contains("testuser");
     assertThat(content).contains("test@example.com");
+  }
+
+  @Test
+  public void testUserSearchWithSqlInjectionAttempt() throws Exception {
+    // Setup - empty list to simulate no injection results
+    List<User> emptyList = Arrays.asList();
+    when(employeeService.findUserByUsername("' OR '1'='1")).thenReturn(emptyList);
+
+    // Test
+    mockMvc
+        .perform(
+            get("/api/user-search")
+                .param("username", "' OR '1'='1")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
+
+    // Verify that the service was called with the injection attempt parameter
+    verify(employeeService).findUserByUsername("' OR '1'='1");
   }
 
   @Test
