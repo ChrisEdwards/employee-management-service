@@ -23,25 +23,25 @@ import com.example.service.EmployeeService;
 @Import(SecurityConfig.class)
 public class EmployeeControllerSecurityTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @MockBean
-    private EmployeeService employeeService;
+  @MockBean private EmployeeService employeeService;
 
-    @Test
-    public void testUserSearchExample_WithSQLInjectionPayload() throws Exception {
-        // Setup - SQL injection payload
-        String sqlInjectionPayload = "' OR '1'='1";
-        when(employeeService.findUserByUsername(eq(sqlInjectionPayload))).thenReturn(new ArrayList<>());
+  @Test
+  public void testUserSearchExample_WithSQLInjectionPayload() throws Exception {
+    // Setup - SQL injection payload
+    String sqlInjectionPayload = "' OR '1'='1";
+    when(employeeService.findUserByUsername(eq(sqlInjectionPayload))).thenReturn(new ArrayList<>());
 
-        // Execute & Verify
-        mockMvc.perform(get("/api/user-search")
+    // Execute & Verify
+    mockMvc
+        .perform(
+            get("/api/user-search")
                 .param("username", sqlInjectionPayload)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        .andExpect(status().isOk());
 
-        // Verify that the service was called with the payload as a parameter
-        verify(employeeService).findUserByUsername(eq(sqlInjectionPayload));
-    }
+    // Verify that the service was called with the payload as a parameter
+    verify(employeeService).findUserByUsername(eq(sqlInjectionPayload));
+  }
 }
