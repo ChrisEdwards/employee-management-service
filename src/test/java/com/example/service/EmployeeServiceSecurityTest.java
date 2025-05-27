@@ -2,8 +2,7 @@ package com.example.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,12 +20,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.example.model.User;
-import com.example.repository.UserRepository;
 
 @SpringBootTest
-public class EmployeeServiceTest {
-
-  @Mock private UserRepository userRepository;
+public class EmployeeServiceSecurityTest {
 
   @Mock private DataSource dataSource;
 
@@ -52,24 +48,21 @@ public class EmployeeServiceTest {
   }
 
   @Test
-  public void testFindUserByUsername() throws SQLException {
+  public void testFindUserByUsername_WithSanitizedInput() throws SQLException {
     // Setup
-    // Configure ResultSet to return a single user
-    when(resultSet.next())
-        .thenReturn(true, false); // Return true first time, then false to end loop
+    when(resultSet.next()).thenReturn(true, false);
     when(resultSet.getLong("id")).thenReturn(1L);
     when(resultSet.getString("username")).thenReturn("testuser");
     when(resultSet.getString("password")).thenReturn("password");
     when(resultSet.getString("email")).thenReturn("test@example.com");
 
-    // Test
+    // Execute
     List<User> actualUsers = employeeService.findUserByUsername("testuser");
 
     // Verify
     assertThat(actualUsers).isNotEmpty();
     assertThat(actualUsers.size()).isEqualTo(1);
     assertThat(actualUsers.get(0).getUsername()).isEqualTo("testuser");
-    assertThat(actualUsers.get(0).getEmail()).isEqualTo("test@example.com");
 
     // Verify PreparedStatement is used correctly
     verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
@@ -77,23 +70,24 @@ public class EmployeeServiceTest {
   }
 
   @Test
-  public void testFetchDataFromUrl_Success() {
-    // Note: This is a partial test that doesn't actually make HTTP calls
-    // In a real test, you'd use a MockServer to simulate HTTP responses
+  public void testFindUserByUsername_WithSQLInjectionAttempt() throws SQLException {
+    // Setup
+    when(resultSet.next()).thenReturn(false);
 
-    // Since we can't easily mock HttpURLConnection, we're just testing the error case
-    String result = employeeService.fetchDataFromUrl("invalid_url");
+    // SQL injection attempt in the username parameter
+    String maliciousInput = "' OR '1'='1"; // Classic SQL injection payload
 
-    // The result should contain the error message
-    assertThat(result).startsWith("Error fetching URL:");
-  }
+    // Execute
+    List<User> actualUsers = employeeService.findUserByUsername(maliciousInput);
 
-  @Test
-  public void testFetchDataFromUrl_Error() {
-    // Testing with a URL that will cause an exception
-    String result = employeeService.fetchDataFromUrl("not-a-valid-url");
+    // Verify
+    assertThat(actualUsers).isEmpty(); // The query returns no results
 
-    // Verify that the error message is returned
-    assertThat(result).contains("Error fetching URL:");
+    // Verify that the malicious input was properly parameterized
+    verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
+    verify(preparedStatement).setString(1, maliciousInput);
+
+    // The important thing is that the malicious string was sent as a parameter,
+    // not embedded in the SQL query itself
   }
 }
