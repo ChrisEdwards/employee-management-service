@@ -27,13 +27,4 @@ public class SecurityConfig {
 
     return http.build();
   }
-
-  /**
-   * Define a BCryptPasswordEncoder bean to replace the default password encoder which uses SHA-1
-   * (insecure) through MessageDigestPasswordEncoder
-   */
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
 }
