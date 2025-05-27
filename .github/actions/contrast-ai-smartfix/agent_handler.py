@@ -389,10 +389,6 @@ This PR addresses a vulnerability identified by the Contrast Security platform (
 [Your **very brief** summary of the fix applied goes here]
 
 [Your **concise** explanation of why the fix works goes here]
-
-## Testing
-
-Automated test writing/updating was skipped based on configuration.
 </pr_body>
 """
 
