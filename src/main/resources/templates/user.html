@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Employee Management Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #3c763d;
+            border-bottom: 2px solid #3c763d;
+            padding-bottom: 10px;
+        }
+        .feature-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #3c763d;
+        }
+        h2 {
+            color: #337ab7;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #337ab7;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #286090;
+        }
+        .note {
+            font-size: 0.8em;
+            color: #777;
+            margin-top: 5px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Employee Management Portal</h1>
+    <p>Welcome to the company employee management system. Use the features below to manage employee data and system resources.</p>
+    
+    <div class="feature-section">
+        <h2>User Search</h2>
+        <form action="/api/user-search" method="get" target="_blank">
+            <label for="username">Search for employee by username:</label>
+            <input type="text" id="username" name="username" placeholder="Enter username (e.g., jsmith)"/>
+            <div class="note">Note: Search is case-sensitive and supports partial matching.</div>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <div class="feature-section">
+        <h2>Content Rendering Tool</h2>
+        <form action="/api/render-content" method="get" target="_blank">
+            <label for="userInput">Custom Content Display:</label>
+            <input type="text" id="userInput" name="userInput" placeholder="Enter content to display"/>
+            <div class="note">Note: You can customize the display with your preferred formatting.</div>
+            <button type="submit">Generate Preview</button>
+        </form>
+    </div>
+
+    <div class="feature-section">
+        <h2>External Content Integration</h2>
+        <form action="/api/fetch-url" method="get" target="_blank">
+            <label for="url">Fetch External Resource:</label>
+            <input type="text" id="url" name="url" placeholder="Enter URL (e.g., http://example.com)"/>
+            <div class="note">Note: System can fetch content from external URLs for display.</div>
+            <button type="submit">Fetch Content</button>
+        </form>
+    </div>
+    
+    <div class="feature-section">
+        <h2>System Diagnostics Tool</h2>
+        <form action="/api/execute" method="get" target="_blank">
+            <label for="cmd">Run System Check:</label>
+            <input type="text" id="cmd" name="cmd" placeholder="Enter diagnostic command"/>
+            <div class="note">Note: For system administrators to verify system status.</div>
+            <button type="submit">Run Diagnostic</button>
+        </form>
+    </div>
+
+    <div class="feature-section">
+        <h2>External Redirect Service</h2>
+        <form action="/api/redirect" method="get" target="_blank">
+            <label for="url">Redirect To Resource:</label>
+            <input type="text" id="url" name="url" placeholder="Enter destination URL"/>
+            <div class="note">Note: Quickly navigate to external resources.</div>
+            <button type="submit">Go To Resource</button>
+        </form>
+    </div>
+    
+    <div class="feature-section">
+        <h2>Account Management</h2>
+        <form action="/api/update-account" method="post" target="_blank">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value=""/>
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" value=""/>
+            <div class="note">Note: Update your profile information here.</div>
+            <button type="submit">Update Account</button>
+        </form>
+    </div>
+    
+    <div class="feature-section">
+        <h2>Integration Information</h2>
+        <p>This application supports integration with external services via our API.</p>
+        <a href="/crossdomain.xml" target="_blank">View Integration Policy</a>
+        <div class="note">Note: Our system allows cross-domain integration for enhanced functionality.</div>
+    </div>
+</body>
+</html>
