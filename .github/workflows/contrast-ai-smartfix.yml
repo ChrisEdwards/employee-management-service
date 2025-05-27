@@ -24,7 +24,7 @@ on:
     types:
       - closed
   schedule:
-     - cron: '0 0 * * *' # Runs daily at midnight UTC
+     - cron: '0 0 * * *' # <-- Customer configured schedule
   workflow_dispatch: # Allows manual triggering
 
 permissions:
@@ -71,6 +71,8 @@ jobs:
           aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
           # --- Agent Configuration ---
           agent_model: ${{ secrets.AGENT_MODEL || 'bedrock/us.anthropic.claude-3-7-sonnet-20250219-v1:0' }}
+          # --- Security Test Options ---
+          attempt_writing_security_test: false
           # --- Skip Comments ---
           skip_comments: ${{ vars.SKIP_COMMENTS || 'false' }}
 

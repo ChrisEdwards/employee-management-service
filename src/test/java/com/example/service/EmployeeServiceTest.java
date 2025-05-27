@@ -2,14 +2,12 @@ package com.example.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -55,12 +53,13 @@ public class EmployeeServiceTest {
   @Test
   public void testFindUserByUsername() throws SQLException {
     // Setup
-    User testUser = new User("testuser", "password", "test@example.com");
-    List<User> expectedUsers = Arrays.asList(testUser);
-    when(userRepository.executeCustomQuery(anyString())).thenReturn(expectedUsers);
-
-    // The direct JDBC execution should return no results, falling back to repository
-    when(resultSet.next()).thenReturn(false);
+    // Configure ResultSet to return a single user
+    when(resultSet.next())
+        .thenReturn(true, false); // Return true first time, then false to end loop
+    when(resultSet.getLong("id")).thenReturn(1L);
+    when(resultSet.getString("username")).thenReturn("testuser");
+    when(resultSet.getString("password")).thenReturn("password");
+    when(resultSet.getString("email")).thenReturn("test@example.com");
 
     // Test
     List<User> actualUsers = employeeService.findUserByUsername("testuser");
@@ -70,10 +69,6 @@ public class EmployeeServiceTest {
     assertThat(actualUsers.size()).isEqualTo(1);
     assertThat(actualUsers.get(0).getUsername()).isEqualTo("testuser");
     assertThat(actualUsers.get(0).getEmail()).isEqualTo("test@example.com");
-
-    // Verify the SQL injection vulnerable query was constructed correctly
-    verify(statement).executeQuery("SELECT * FROM users WHERE username = 'testuser'");
-    verify(userRepository).executeCustomQuery("SELECT * FROM users WHERE username = 'testuser'");
   }
 
   @Test
@@ -95,30 +90,5 @@ public class EmployeeServiceTest {
 
     // Verify that the error message is returned
     assertThat(result).contains("Error fetching URL:");
-  }
-
-  @Test
-  public void testFindUserByUsername_SQLInjection() throws SQLException {
-    // Setup an attack string that would expose all users
-    String maliciousInput = "anything' OR '1'='1";
-    String expectedSQLInjection = "SELECT * FROM users WHERE username = 'anything' OR '1'='1'";
-
-    // Mock the repository for the fallback
-    when(userRepository.executeCustomQuery(anyString()))
-        .thenReturn(
-            Arrays.asList(
-                new User("admin", "adminpass", "admin@example.com"),
-                new User("user1", "password1", "user1@example.com")));
-
-    // Test with SQL injection payload
-    List<User> result = employeeService.findUserByUsername(maliciousInput);
-
-    // Verify
-    verify(statement).executeQuery(expectedSQLInjection);
-    verify(userRepository).executeCustomQuery(expectedSQLInjection);
-
-    // Verify we got results (in this case, from the mocked repository)
-    assertThat(result).hasSize(2);
-    assertThat(result.get(0).getUsername()).isEqualTo("admin");
   }
 }

@@ -10,12 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.model.User;
-import com.example.repository.UserRepository;
 
 @Service
 public class EmployeeService {
-
-  @Autowired private UserRepository userRepository;
 
   @Autowired private javax.sql.DataSource dataSource;
 
@@ -24,23 +21,26 @@ public class EmployeeService {
 
     String query = "SELECT * FROM users WHERE username = '" + username + "'";
 
-    System.out.println("Executing SQL: " + query);
-
     try {
       java.sql.Connection connection = dataSource.getConnection();
       java.sql.Statement statement = connection.createStatement();
-
       statement.setEscapeProcessing(false);
 
-      java.sql.ResultSet resultSet = statement.executeQuery(query);
+      try (java.sql.ResultSet resultSet = statement.executeQuery(query)) {
 
-      while (resultSet.next()) {
-        User user = new User();
-        user.setId(resultSet.getLong("id"));
-        user.setUsername(resultSet.getString("username"));
-        user.setPassword(resultSet.getString("password"));
-        user.setEmail(resultSet.getString("email"));
-        users.add(user);
+        while (resultSet.next()) {
+          User user = new User();
+          user.setId(resultSet.getLong("id"));
+          user.setUsername(resultSet.getString("username"));
+          user.setPassword(resultSet.getString("password"));
+          user.setEmail(resultSet.getString("email"));
+          users.add(user);
+        }
+      } catch (java.sql.SQLException e) {
+        System.err.println("SQL Error: " + e.getMessage());
+        System.err.println("SQL State: " + e.getSQLState());
+        System.err.println("Error Code: " + e.getErrorCode());
+        e.printStackTrace();
       }
     } catch (java.sql.SQLException e) {
       System.err.println("SQL Error: " + e.getMessage());
@@ -49,7 +49,7 @@ public class EmployeeService {
       e.printStackTrace();
     }
 
-    return users.isEmpty() ? userRepository.executeCustomQuery(query) : users;
+    return users;
   }
 
   public String fetchDataFromUrl(String url) {
