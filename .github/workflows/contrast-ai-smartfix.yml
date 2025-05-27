@@ -50,7 +50,7 @@ jobs:
           # --- Base Branch ---
           base_branch: main
           # --- Build Command ---
-          build_command: 'mvn clean install'
+          build_command: 'mvn clean test'
           max_build_attempts: 6
           # --- Vulnerability Configuration ---
           vulnerability_severities: '["CRITICAL", "HIGH"]'
