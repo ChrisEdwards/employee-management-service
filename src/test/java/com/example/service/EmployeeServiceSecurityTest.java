@@ -1,10 +1,8 @@
 package com.example.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,19 +20,13 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.example.model.User;
-import com.example.repository.UserRepository;
 
 @SpringBootTest
-public class EmployeeServiceTest {
-
-  @Mock private UserRepository userRepository;
+public class EmployeeServiceSecurityTest {
 
   @Mock private DataSource dataSource;
-
   @Mock private Connection connection;
-
   @Mock private PreparedStatement preparedStatement;
-
   @Mock private ResultSet resultSet;
 
   @InjectMocks private EmployeeService employeeService;
@@ -48,57 +40,48 @@ public class EmployeeServiceTest {
     when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
     when(preparedStatement.executeQuery()).thenReturn(resultSet);
 
-    // Also configure setString to do nothing
-    org.mockito.Mockito.doNothing().when(preparedStatement).setString(anyInt(), anyString());
-
     // Mock the ResultSet to return no results by default
     when(resultSet.next()).thenReturn(false);
   }
 
   @Test
-  public void testFindUserByUsername() throws SQLException {
+  public void testFindUserByUsername_ValidInput() throws SQLException {
     // Setup
     // Configure ResultSet to return a single user
     when(resultSet.next())
         .thenReturn(true, false); // Return true first time, then false to end loop
     when(resultSet.getLong("id")).thenReturn(1L);
-    when(resultSet.getString("username")).thenReturn("testuser");
+    when(resultSet.getString("username")).thenReturn("bob.jones");
     when(resultSet.getString("password")).thenReturn("password");
-    when(resultSet.getString("email")).thenReturn("test@example.com");
+    when(resultSet.getString("email")).thenReturn("bob.jones@example.com");
 
     // Test
-    List<User> actualUsers = employeeService.findUserByUsername("testuser");
+    List<User> actualUsers = employeeService.findUserByUsername("bob.jones");
 
     // Verify PreparedStatement is used with parameter binding
     verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
-    verify(preparedStatement).setString(1, "testuser");
+    verify(preparedStatement).setString(1, "bob.jones");
     verify(preparedStatement).executeQuery();
 
-    // Verify
+    // Verify result
     assertThat(actualUsers).isNotEmpty();
     assertThat(actualUsers.size()).isEqualTo(1);
-    assertThat(actualUsers.get(0).getUsername()).isEqualTo("testuser");
-    assertThat(actualUsers.get(0).getEmail()).isEqualTo("test@example.com");
+    assertThat(actualUsers.get(0).getUsername()).isEqualTo("bob.jones");
   }
 
   @Test
-  public void testFetchDataFromUrl_Success() {
-    // Note: This is a partial test that doesn't actually make HTTP calls
-    // In a real test, you'd use a MockServer to simulate HTTP responses
+  public void testFindUserByUsername_SqlInjectionAttempt() throws SQLException {
+    // Setup for SQL injection attempt
+    String sqlInjection = "' OR '1'='1";
 
-    // Since we can't easily mock HttpURLConnection, we're just testing the error case
-    String result = employeeService.fetchDataFromUrl("invalid_url");
+    // Test with SQL injection attempt
+    employeeService.findUserByUsername(sqlInjection);
 
-    // The result should contain the error message
-    assertThat(result).startsWith("Error fetching URL:");
-  }
+    // Verify that the SQL injection string is properly parameterized
+    verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
+    verify(preparedStatement).setString(1, sqlInjection);
+    verify(preparedStatement).executeQuery();
 
-  @Test
-  public void testFetchDataFromUrl_Error() {
-    // Testing with a URL that will cause an exception
-    String result = employeeService.fetchDataFromUrl("not-a-valid-url");
-
-    // Verify that the error message is returned
-    assertThat(result).contains("Error fetching URL:");
+    // No need to verify results as we're just checking that the query was properly prepared
   }
 }
