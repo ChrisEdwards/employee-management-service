@@ -50,7 +50,7 @@ public class EmployeeControllerSecurityTest {
     // Verify that the service was called with the exact SQL injection string
     verify(employeeService).findUserByUsername(eq(sqlInjectionPayload));
   }
-  
+
   @Test
   public void testUserSearchExample_WithValidInput() throws Exception {
     // Setup

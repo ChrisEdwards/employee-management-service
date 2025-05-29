@@ -48,7 +48,8 @@ public class EmployeeServiceSecurityTest {
   public void testFindUserByUsername_ValidInput() throws SQLException {
     // Setup
     // Configure ResultSet to return a single user
-    when(resultSet.next()).thenReturn(true, false); // Return true first time, then false to end loop
+    when(resultSet.next())
+        .thenReturn(true, false); // Return true first time, then false to end loop
     when(resultSet.getLong("id")).thenReturn(1L);
     when(resultSet.getString("username")).thenReturn("bob.jones");
     when(resultSet.getString("password")).thenReturn("password");
@@ -61,7 +62,7 @@ public class EmployeeServiceSecurityTest {
     verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
     verify(preparedStatement).setString(1, "bob.jones");
     verify(preparedStatement).executeQuery();
-    
+
     // Verify result
     assertThat(actualUsers).isNotEmpty();
     assertThat(actualUsers.size()).isEqualTo(1);
@@ -72,15 +73,15 @@ public class EmployeeServiceSecurityTest {
   public void testFindUserByUsername_SqlInjectionAttempt() throws SQLException {
     // Setup for SQL injection attempt
     String sqlInjection = "' OR '1'='1";
-    
+
     // Test with SQL injection attempt
     employeeService.findUserByUsername(sqlInjection);
-    
+
     // Verify that the SQL injection string is properly parameterized
     verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
     verify(preparedStatement).setString(1, sqlInjection);
     verify(preparedStatement).executeQuery();
-    
+
     // No need to verify results as we're just checking that the query was properly prepared
   }
 }
