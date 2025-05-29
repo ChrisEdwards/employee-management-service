@@ -3,7 +3,6 @@ package com.example.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +47,7 @@ public class EmployeeServiceTest {
     when(dataSource.getConnection()).thenReturn(connection);
     when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
     when(preparedStatement.executeQuery()).thenReturn(resultSet);
-    
+
     // Also configure setString to do nothing
     org.mockito.Mockito.doNothing().when(preparedStatement).setString(anyInt(), anyString());
 
