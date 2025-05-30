@@ -44,7 +44,7 @@ Based on the information above and the code context you can access via tools (li
         - Ensure any annotations or dependency injection approaches in your mocks match the real implementation
         - Confirm that mock behavior (return values, exceptions) aligns with the real implementation's behavior
     - If testing isn't feasible (e.g., requires complex setup beyond file modification), explain why in your final report.
-5. **IMPORTANT:** Conclude your response with the complete, formatted Markdown text intended for the body of a Pull Request. This Markdown should include:
+5. **IMPORTANT:** Conclude your response with analytics data and the complete, formatted Markdown text intended for the body of a GitHub Pull Request surrounded by xml tags, as shown in the example below. This Markdown should include:
     - A link to the Contrast Vulnerability Details: `{contrast_ui_url}`.
     - A section titled `## Vulnerability Summary` containing a **very brief** (1-2 sentences) summary of the vulnerability.
     - A section titled `## Fix Summary` containing:
@@ -53,10 +53,13 @@ Based on the information above and the code context you can access via tools (li
     - A section titled `## Testing` describing **briefly** how the fix was tested or why testing wasn't feasible.
 
 Example final output format:
-Contrast Vulnerability Details: {contrast_ui_url}
-
-[Output the below note verbatim]
-**Note:** If rejecting this PR, please add a comment explaining the reason to help improve future suggestions.
+<analytics>
+Confidence Score: [Your **very brief** confidence score (0%-100%) goes here to indicate your confidence in the fix]
+</analytics>
+<pr_body>
+## Contrast AI SmartFix
+[Output the below sentence verbatim]
+This PR addresses a vulnerability identified by the Contrast Security platform (ID: [{vuln_uuid}]({contrast_ui_url})).
 
 ## Vulnerability Summary
 
@@ -68,10 +71,9 @@ Contrast Vulnerability Details: {contrast_ui_url}
 
 [Your **concise** explanation of why the fix works goes here]
 
-**Confidence Score:** [Your **very brief** confidence score (0%-100%) goes here to indicate your confidence in the fix]
-
 ## Testing
 
 [**Briefly** describe how the fix was tested or why testing wasn't feasible.]
+</pr_body>
 
 **Do not include the backticks (```) from the example in your actual response.** Your final response should start directly with `Contrast Vulnerability Details:` and contain only the formatted Markdown for the PR body.
