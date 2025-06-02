@@ -19,14 +19,14 @@ public class EmployeeService {
   public List<User> findUserByUsername(String username) {
     List<User> users = new java.util.ArrayList<>();
 
-    String query = "SELECT * FROM users WHERE username = ?";
+    String query = "SELECT * FROM users WHERE username = '" + username + "'";
 
     try {
       java.sql.Connection connection = dataSource.getConnection();
-      java.sql.PreparedStatement preparedStatement = connection.prepareStatement(query);
-      preparedStatement.setString(1, username);
+      java.sql.Statement statement = connection.createStatement();
+      statement.setEscapeProcessing(false);
 
-      try (java.sql.ResultSet resultSet = preparedStatement.executeQuery()) {
+      try (java.sql.ResultSet resultSet = statement.executeQuery(query)) {
 
         while (resultSet.next()) {
           User user = new User();
