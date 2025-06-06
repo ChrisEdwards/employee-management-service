@@ -125,71 +125,108 @@ await useMcpTool({
 });
 ```
 
-## Critical Best Practices
-
-1. **ALWAYS read the file first** with `read_file` to see exact content
-2. **Copy exact text from the file** - don't manually recreate it
-3. **Include sufficient context** to make matches unique
-4. **Match exact indentation** patterns from the file
-5. **Make multiple separate calls** for dependent changes
-6. Use `dryRun: true` only for complex/critical changes
-7. If all else fails, use `read_file` + modify + `write_file`
-
-## Pattern for Success
+## CRITICAL WORKFLOW FOR SUCCESS
 
 ```javascript
-// Step 1: Read file to get exact content
-const content = await useMcpTool({
+// Step 1: ALWAYS read the file to get exact content - NEVER SKIP THIS STEP
+const fileContent = await useMcpTool({
   serverName: "filesystem",
-  toolName: "read_file",
-  arguments: { path: "file.js" }
+  toolName: "read_file", 
+  arguments: { path: "path/to/file.js" }
 });
 
-// Step 2: Make targeted edits using exact copied text
+// Step 2: Directly COPY the text to modify from the file content
+// DO NOT try to recreate or modify escape sequences
+const textToModify = "..."; // Exact text copied from fileContent
+
+// Step 3: Create modified version
+const modifiedText = "..."; // Your changes to textToModify
+
+// Step 4: Use edit_file with the EXACT copied text
 await useMcpTool({
   serverName: "filesystem",
   toolName: "edit_file",
   arguments: {
-    path: "file.js",
+    path: "path/to/file.js",
     edits: [{
-      // Copy text EXACTLY from file content, include context
-      oldText: "function example() {\n  return value;\n}",
-      newText: "function example() {\n  return newValue;\n}"
+      oldText: textToModify,
+      newText: modifiedText
     }]
   }
 });
 ```
 
-## Interpreting the Diff Output
+## Understanding Tool Output
 
-The tool returns a git-style diff that looks like this:
-
+### Successful Edit
+The tool returns a git-style diff showing what changed:
 ```diff
 --- file
 +++ file
 @@ -1,5 +1,5 @@
- function greet(name) {
--  return "Hello " + name;
-+  return `Hello there " + name;
-   // End of function
+ function example() {
+-  return oldValue;
++  return newValue;
+   // More code...
  }
 ```
+- Lines starting with `-` were removed
+- Lines starting with `+` were added
+- Other lines are context (unchanged)
 
-- Lines starting with `-` are being removed
-- Lines starting with `+` are being added
-- Lines without prefix are unchanged context
+### Failed Edit
+If the match fails, you get an error:
+```
+Error: Could not find exact match for edit:
+[text that couldn't be found]
+```
 
-In dryRun mode, this shows what would change; otherwise, it shows what has been changed.
+## Special Characters & Regex Patterns
 
-## Troubleshooting
+When working with text containing backslashes, quotes, or regex patterns:
 
-If a match fails:
-1. Verify you've copied text exactly from the file
-2. Add more surrounding context
-3. Check indentation and line endings
-4. For multiple edits, make separate sequential calls
+1. **NEVER manually construct or modify escape sequences** - they will almost certainly be wrong
+2. **ALWAYS use the read-then-copy approach** shown above
+3. For complex regex or escape sequences, copy larger blocks of surrounding text to ensure uniqueness
+4. Additional Guidance: When editing regex patterns with intricate escape sequences, ensure that the copied text matches exactly—including all escapes for quotes and backslashes. Avoid manual modifications and verify that the replacement string retains the original escapes.
 
-Remember: The tool has *some* whitespace flexibility but exact matches are most reliable. Always prefer copying exact text from the file over recreating it manually.
+## Handling Failed Matches
+
+If you get "Could not find exact match" errors:
+
+1. **Re-read the file** - the content may have changed
+2. **Copy a larger section of text** that includes your target plus surrounding context. The match must be unique or it will fail. Including more context can ensure uniqueness.
+3. **Include complete lines** with proper indentation
+4. **For multi-line regex patterns** or complex escaping, include entire function/method blocks
+
+## Fallback For Complex Cases
+
+If exact matching repeatedly fails for complex patterns (especially regex):
+
+```javascript
+// Read the entire file
+const content = await useMcpTool({
+  serverName: "filesystem", 
+  toolName: "read_file",
+  arguments: { path: "path/to/file.js" }
+});
+
+// Modify content programmatically
+// Use string operations that don't require manually reconstructing escape sequences
+const modifiedContent = content.replace(
+  /pattern that doesn't require manual escape sequence construction/g, 
+  "replacement"
+);
+
+// Write back the entire file
+await useMcpTool({
+  serverName: "filesystem",
+  toolName: "write_file",
+  arguments: { 
+    path: "path/to/file.js", 
+    content: modifiedContent 
+  }
+});
 
 
 ====
