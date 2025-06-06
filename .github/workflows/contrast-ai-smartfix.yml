@@ -65,7 +65,7 @@ jobs:
           contrast_authorization_key: ${{ secrets.CONTRAST_AUTHORIZATION_KEY }}
           contrast_api_key: ${{ secrets.CONTRAST_API_KEY }}
           # --- Google Gemini API Credentials (LiteLLM) ---
-          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          #gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           # --- Azure Open API Credentials (LiteLLM) ---
           azure_api_key: ${{ secrets.AZURE_API_KEY }}
           azure_api_base: ${{ secrets.AZURE_API_BASE }}
