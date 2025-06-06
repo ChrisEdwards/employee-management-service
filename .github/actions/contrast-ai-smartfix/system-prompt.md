@@ -180,6 +180,27 @@ await useMcpTool({
 });
 ```
 
+## Interpreting the Diff Output
+
+The tool returns a git-style diff that looks like this:
+
+```diff
+--- file
++++ file
+@@ -1,5 +1,5 @@
+ function greet(name) {
+-  return "Hello " + name;
++  return `Hello ${name}`;
+   // End of function
+ }
+```
+
+- Lines starting with `-` are being removed
+- Lines starting with `+` are being added
+- Lines without prefix are unchanged context
+
+In dryRun mode, this shows what would change; otherwise, it shows what has been changed.
+
 ## Troubleshooting
 
 If a match fails:
