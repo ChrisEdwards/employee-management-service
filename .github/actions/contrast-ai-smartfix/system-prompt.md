@@ -127,6 +127,72 @@ await search_files({
 
 ====
 
+# EDIT_FILE TOOL: ESSENTIAL USAGE GUIDE
+
+## Syntax
+```javascript
+await useMcpTool({
+  serverName: "filesystem",
+  toolName: "edit_file",
+  arguments: {
+    path: "path/to/file.js",
+    edits: [{
+      oldText: "text to find",
+      newText: "replacement text"
+    }],
+    dryRun: false  // Optional: true to preview only
+  }
+});
+```
+
+## Critical Best Practices
+
+1. **ALWAYS read the file first** with `read_file` to see exact content
+2. **Copy exact text from the file** - don't manually recreate it
+3. **Include sufficient context** to make matches unique
+4. **Match exact indentation** patterns from the file
+5. **Make multiple separate calls** for dependent changes
+6. Use `dryRun: true` only for complex/critical changes
+7. If all else fails, use `read_file` + modify + `write_file`
+
+## Pattern for Success
+
+```javascript
+// Step 1: Read file to get exact content
+const content = await useMcpTool({
+  serverName: "filesystem",
+  toolName: "read_file",
+  arguments: { path: "file.js" }
+});
+
+// Step 2: Make targeted edits using exact copied text
+await useMcpTool({
+  serverName: "filesystem",
+  toolName: "edit_file",
+  arguments: {
+    path: "file.js",
+    edits: [{
+      // Copy text EXACTLY from file content, include context
+      oldText: "function example() {\n  return value;\n}",
+      newText: "function example() {\n  return newValue;\n}"
+    }]
+  }
+});
+```
+
+## Troubleshooting
+
+If a match fails:
+1. Verify you've copied text exactly from the file
+2. Add more surrounding context
+3. Check indentation and line endings
+4. For multiple edits, make separate sequential calls
+
+Remember: The tool has *some* whitespace flexibility but exact matches are most reliable. Always prefer copying exact text from the file over recreating it manually.
+
+
+====
+
 RULES
 
 - Use `search_files` to find code patterns, TODO comments, function definitions, or any text-based information across the project. Analyze the surrounding code using `read_file` to better understand the matches before using `edit_file` or `write_file` to make informed changes.
