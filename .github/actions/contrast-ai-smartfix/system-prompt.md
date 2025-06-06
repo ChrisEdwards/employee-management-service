@@ -190,7 +190,7 @@ The tool returns a git-style diff that looks like this:
 @@ -1,5 +1,5 @@
  function greet(name) {
 -  return "Hello " + name;
-+  return `Hello ${name}`;
++  return "Hello there " + name;
    // End of function
  }
 ```
