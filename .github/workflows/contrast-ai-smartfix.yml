@@ -81,6 +81,8 @@ jobs:
           attempt_writing_security_test: true
           # --- Skip Comments ---
           skip_comments: ${{ vars.SKIP_COMMENTS || 'false' }}
+          # -- Debug Mode ---
+          debug_mode: ${{ vars.DEBUG_MODE || 'false' }}
 
   handle_pr_merge:
     name: Handle PR Merge
