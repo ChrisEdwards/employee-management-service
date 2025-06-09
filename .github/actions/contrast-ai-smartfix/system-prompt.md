@@ -247,7 +247,7 @@ await useMcpTool({
     content: modifiedContent 
   }
 });
-
+```
 
 ====
 
