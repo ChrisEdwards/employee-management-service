@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -33,6 +34,8 @@ public class EmployeeServiceTest {
 
   @Mock private Statement statement;
 
+  @Mock private PreparedStatement preparedStatement;
+
   @Mock private ResultSet resultSet;
 
   @InjectMocks private EmployeeService employeeService;
@@ -43,6 +46,10 @@ public class EmployeeServiceTest {
 
     // Configure the mock DataSource
     when(dataSource.getConnection()).thenReturn(connection);
+    when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+    when(preparedStatement.executeQuery()).thenReturn(resultSet);
+    
+    // For backward compatibility
     when(connection.createStatement()).thenReturn(statement);
     when(statement.executeQuery(anyString())).thenReturn(resultSet);
 

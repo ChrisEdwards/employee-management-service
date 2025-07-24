@@ -1,7 +1,6 @@
 package com.example.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -44,7 +43,7 @@ public class EmployeeServiceSecurityTest {
     when(dataSource.getConnection()).thenReturn(connection);
     when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
     when(preparedStatement.executeQuery()).thenReturn(resultSet);
-    
+
     // Statement would be used in vulnerable code
     when(connection.createStatement()).thenReturn(statement);
     when(statement.executeQuery(anyString())).thenReturn(resultSet);
@@ -66,11 +65,11 @@ public class EmployeeServiceSecurityTest {
     verify(connection).prepareStatement(anyString());
     verify(preparedStatement).setString(1, maliciousUsername);
     verify(preparedStatement).executeQuery();
-    
+
     // Verify that the vulnerable path is not used
     verify(connection, never()).createStatement();
     verify(statement, never()).executeQuery(anyString());
-    
+
     // This test verifies that:
     // 1. PreparedStatement is used (not Statement)
     // 2. The malicious input is safely parameterized
@@ -94,7 +93,7 @@ public class EmployeeServiceSecurityTest {
     assertThat(result.size()).isEqualTo(1);
     assertThat(result.get(0).getUsername()).isEqualTo("normaluser");
     assertThat(result.get(0).getEmail()).isEqualTo("normal@example.com");
-    
+
     // And verify the secure approach was used
     verify(preparedStatement).setString(1, "normaluser");
     verify(preparedStatement).executeQuery();
