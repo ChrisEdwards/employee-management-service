@@ -49,7 +49,7 @@ jobs:
           base_branch: '${{ github.event.repository.default_branch }}' # This will default to your repo default branch (other common base branches are 'main', 'master' or 'develop')
 
           # Other Configuration
-          max_open_prs: 5 # This is the maximum limit for the number of PRs that SmartFix will have open at single time
+          max_open_prs: 1 # This is the maximum limit for the number of PRs that SmartFix will have open at single time
           
           # LLM Configuration (Bring Your Own LLM)
           # Choose ONE LLM provider and configure its credentials
