@@ -20,13 +20,13 @@ jobs:
     steps:
       # For Claude via AWS Bedrock, please include an additional setup step for configuring AWS credentials
       # This step can be omitted if using another LLM provider.
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: ${{ vars.AWS_REGION }}
+      #- name: Configure AWS Credentials
+      #  uses: aws-actions/configure-aws-credentials@v4
+      #  with:
+      #    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #    aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+      #    aws-region: ${{ vars.AWS_REGION }}
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -64,7 +64,6 @@ jobs:
           # Claude Via AWS Bedrock
           # Setup AWS credentials in the earlier "Configure AWS Credentials" step.
           # agent_model: 'bedrock/us.anthropic.claude-3-7-sonnet-20250219-v1:0' # Example for Claude Sonnet on Bedrock
-          aws_region: us-east-1
 
           # Experimental: Google Gemini Pro
           # agent_model: 'gemini/gemini-2.5-pro-preview-05-06' # Check LiteLLM docs for exact model string
