@@ -74,20 +74,13 @@ public class EmployeeService {
     }
   }
 
-  /**
-   * List of allowed commands for secure command execution.
-   */
-  private static final List<String> ALLOWED_COMMANDS = List.of(
-      "ls",
-      "pwd",
-      "whoami",
-      "date",
-      "uptime"
-  );
+  /** List of allowed commands for secure command execution. */
+  private static final List<String> ALLOWED_COMMANDS =
+      List.of("ls", "pwd", "whoami", "date", "uptime");
 
   /**
    * Validates if a command is in the allowed list.
-   * 
+   *
    * @param command The command to validate
    * @return true if the command is allowed, false otherwise
    */
@@ -97,15 +90,16 @@ public class EmployeeService {
 
   /**
    * Executes a system command if it's in the allowed list.
-   * 
+   *
    * @param command The command to execute
    * @return The command output or an error message
    */
   public String executeCommand(String command) {
     if (!isCommandAllowed(command)) {
-      return "Command not allowed for security reasons. Allowed commands: " + String.join(", ", ALLOWED_COMMANDS);
+      return "Command not allowed for security reasons. Allowed commands: "
+          + String.join(", ", ALLOWED_COMMANDS);
     }
-    
+
     try {
       ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
       Process process = processBuilder.start();
