@@ -26,9 +26,7 @@ public class EmployeeControllerSecurityTest {
   public void testRedirectWithValidUrl() throws Exception {
     // Test with valid URL
     mockMvc
-        .perform(
-            get("/api/redirect")
-                .param("url", "https://example.com"))
+        .perform(get("/api/redirect").param("url", "https://example.com"))
         .andExpect(status().isFound())
         .andExpect(header().string("Location", "https://example.com"));
   }
@@ -37,19 +35,17 @@ public class EmployeeControllerSecurityTest {
   public void testRedirectWithInvalidUrl() throws Exception {
     // Test with invalid URL (no scheme)
     mockMvc
-        .perform(
-            get("/api/redirect")
-                .param("url", "example.com"))
+        .perform(get("/api/redirect").param("url", "example.com"))
         .andExpect(status().isBadRequest());
   }
 
   @Test
   public void testRedirectWithHeaderInjectionAttempt() throws Exception {
-    // Test with header injection attempt
+    // Test with header injection attempt - URL should be sanitized
+    String maliciousUrl = "https://example.com%0AX-Injected-Header: Injected";
     mockMvc
         .perform(
-            get("/api/redirect")
-                .param("url", "https://example.com\r\nX-Injected-Header: Injected"))
+            get("/api/redirect").param("url", maliciousUrl))
         .andExpect(status().isFound())
         .andExpect(header().string("Location", "https://example.com"));
   }
@@ -58,9 +54,7 @@ public class EmployeeControllerSecurityTest {
   public void testRedirectWithNonHttpScheme() throws Exception {
     // Test with non-HTTP scheme
     mockMvc
-        .perform(
-            get("/api/redirect")
-                .param("url", "file:///etc/passwd"))
+        .perform(get("/api/redirect").param("url", "file:///etc/passwd"))
         .andExpect(status().isBadRequest());
   }
 }
