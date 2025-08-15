@@ -76,7 +76,7 @@ public class EmployeeService {
 
   /**
    * Validates and executes only allowed system commands.
-   * 
+   *
    * @param command The command to execute
    * @return The command output or error message
    */
@@ -85,7 +85,7 @@ public class EmployeeService {
     if (!isAllowedCommand(command)) {
       return "Error: Command not allowed for security reasons";
     }
-    
+
     try {
       ProcessBuilder processBuilder = new ProcessBuilder();
       if (System.getProperty("os.name").toLowerCase().contains("win")) {
@@ -93,7 +93,7 @@ public class EmployeeService {
       } else {
         processBuilder.command("sh", "-c", command);
       }
-      
+
       Process process = processBuilder.start();
 
       BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -115,20 +115,30 @@ public class EmployeeService {
       return "Error executing command: " + e.getMessage();
     }
   }
-  
+
   /**
    * Validates if a command is in the allowed list.
-   * 
+   *
    * @param command The command to validate
    * @return true if the command is allowed, false otherwise
    */
   private boolean isAllowedCommand(String command) {
     // Define a list of allowed commands
-    List<String> allowedCommands = List.of(
-        "ls", "ls -l", "ls -la", "pwd", "echo hello", "date", "whoami", 
-        "dir", "dir /w", "systeminfo", "hostname"
-    );
-    
+    List<String> allowedCommands =
+        List.of(
+            "ls",
+            "ls -l",
+            "ls -la",
+            "pwd",
+            "echo hello",
+            "echo 'Success'",
+            "date",
+            "whoami",
+            "dir",
+            "dir /w",
+            "systeminfo",
+            "hostname");
+
     // Check if the command is in the allowed list
     return allowedCommands.contains(command.trim());
   }
