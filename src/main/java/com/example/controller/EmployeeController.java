@@ -36,6 +36,11 @@ public class EmployeeController {
   public String executeCommandExample(@RequestParam String cmd) {
     return employeeService.executeCommand(cmd);
   }
+  
+  @GetMapping("/execute/help")
+  public String executeCommandHelp() {
+    return "Available commands: list_files, disk_space, memory_usage, current_dir";
+  }
 
   @GetMapping("/redirect")
   public ResponseEntity<String> redirectExample(@RequestParam String url) {

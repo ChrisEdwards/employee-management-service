@@ -74,9 +74,38 @@ public class EmployeeService {
     }
   }
 
-  public String executeCommand(String command) {
+  /**
+   * Executes a command from a predefined list of allowed commands.
+   * 
+   * @param commandKey The key of the command to execute
+   * @return The output of the command execution
+   */
+  public String executeCommand(String commandKey) {
+    // Define a whitelist of allowed commands
+    java.util.Map<String, String> allowedCommands = new java.util.HashMap<>();
+    allowedCommands.put("list_files", "ls -la");
+    allowedCommands.put("disk_space", "df -h");
+    allowedCommands.put("memory_usage", "free -m");
+    allowedCommands.put("current_dir", "pwd");
+    
+    // Validate that the requested command is in the whitelist
+    if (!allowedCommands.containsKey(commandKey)) {
+      return "Error: Command not allowed. Allowed commands are: " + String.join(", ", allowedCommands.keySet());
+    }
+    
+    // Get the actual command to execute from the whitelist
+    String command = allowedCommands.get(commandKey);
+    
     try {
-      Process process = Runtime.getRuntime().exec(command);
+      // Use ProcessBuilder for better security
+      ProcessBuilder processBuilder = new ProcessBuilder();
+      if (System.getProperty("os.name").toLowerCase().contains("win")) {
+        processBuilder.command("cmd.exe", "/c", command);
+      } else {
+        processBuilder.command("sh", "-c", command);
+      }
+      
+      Process process = processBuilder.start();
 
       BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
       StringBuilder output = new StringBuilder();
