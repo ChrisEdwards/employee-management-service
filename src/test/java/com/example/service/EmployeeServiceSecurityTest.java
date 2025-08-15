@@ -2,7 +2,6 @@ package com.example.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,14 +49,14 @@ public class EmployeeServiceSecurityTest {
   public void testFindUserByUsername_PreventsSqlInjection() throws SQLException {
     // Setup - SQL injection attempt
     String maliciousInput = "admin' OR '1'='1";
-    
+
     // Execute the method with malicious input
     employeeService.findUserByUsername(maliciousInput);
-    
+
     // Verify that the input was properly parameterized
     verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
     verify(preparedStatement).setString(1, maliciousInput);
-    
+
     // Verify that executeQuery was called on the PreparedStatement (not with the raw SQL)
     verify(preparedStatement).executeQuery();
   }
@@ -70,15 +69,15 @@ public class EmployeeServiceSecurityTest {
     when(resultSet.getString("username")).thenReturn("testuser");
     when(resultSet.getString("password")).thenReturn("password");
     when(resultSet.getString("email")).thenReturn("test@example.com");
-    
+
     // Execute
     List<User> users = employeeService.findUserByUsername("testuser");
-    
+
     // Verify
     assertThat(users).hasSize(1);
     assertThat(users.get(0).getUsername()).isEqualTo("testuser");
     assertThat(users.get(0).getEmail()).isEqualTo("test@example.com");
-    
+
     // Verify proper parameterization
     verify(preparedStatement).setString(1, "testuser");
   }

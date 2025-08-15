@@ -18,7 +18,7 @@ public class EmployeeService {
 
   /**
    * Safely finds users by username using parameterized queries to prevent SQL injection.
-   * 
+   *
    * @param username the username to search for
    * @return a list of matching users
    */
