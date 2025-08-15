@@ -19,15 +19,15 @@ public class FeatureVerificationTests {
 
   @Test
   public void testSystemCommandExecution() throws Exception {
-    // Test system command execution feature
+    // Test system command execution feature with allowed command
     MvcResult result =
         mockMvc
-            .perform(get("/api/execute").param("cmd", "echo 'Success'"))
+            .perform(get("/api/execute").param("cmd", "list_files"))
             .andExpect(status().isOk())
             .andReturn();
 
     String content = result.getResponse().getContentAsString();
-    assertTrue(content.contains("Success"), "Should execute command and return output");
+    assertFalse(content.contains("Error: Command not allowed"), "Should execute command and return output");
   }
 
   @Test

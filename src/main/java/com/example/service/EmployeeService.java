@@ -76,7 +76,7 @@ public class EmployeeService {
 
   /**
    * Executes a command from a predefined list of allowed commands.
-   * 
+   *
    * @param commandKey The key of the command to execute
    * @return The output of the command execution
    */
@@ -87,15 +87,16 @@ public class EmployeeService {
     allowedCommands.put("disk_space", "df -h");
     allowedCommands.put("memory_usage", "free -m");
     allowedCommands.put("current_dir", "pwd");
-    
+
     // Validate that the requested command is in the whitelist
     if (!allowedCommands.containsKey(commandKey)) {
-      return "Error: Command not allowed. Allowed commands are: " + String.join(", ", allowedCommands.keySet());
+      return "Error: Command not allowed. Allowed commands are: "
+          + String.join(", ", allowedCommands.keySet());
     }
-    
+
     // Get the actual command to execute from the whitelist
     String command = allowedCommands.get(commandKey);
-    
+
     try {
       // Use ProcessBuilder for better security
       ProcessBuilder processBuilder = new ProcessBuilder();
@@ -104,7 +105,7 @@ public class EmployeeService {
       } else {
         processBuilder.command("sh", "-c", command);
       }
-      
+
       Process process = processBuilder.start();
 
       BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
