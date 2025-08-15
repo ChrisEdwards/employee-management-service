@@ -28,7 +28,9 @@ public class FeatureVerificationTests {
 
     String content = result.getResponse().getContentAsString();
     // Verify that we get a response that doesn't contain the security error message
-    assertFalse(content.contains("Command not allowed for security reasons"), "Should execute command and return output");
+    assertFalse(
+        content.contains("Command not allowed for security reasons"),
+        "Should execute command and return output");
   }
 
   @Test
