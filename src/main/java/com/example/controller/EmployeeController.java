@@ -1,5 +1,7 @@
 package com.example.controller;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +43,45 @@ public class EmployeeController {
   public ResponseEntity<String> redirectExample(@RequestParam String url) {
     HttpHeaders headers = new HttpHeaders();
 
-    headers.add("Location", url);
+    String sanitizedUrl = sanitizeUrl(url);
+    if (sanitizedUrl == null) {
+      return new ResponseEntity<>("Invalid URL provided", HttpStatus.BAD_REQUEST);
+    }
 
-    headers.add("X-Custom-Header", "Referrer: " + url);
+    headers.add("Location", sanitizedUrl);
+    headers.add("X-Custom-Header", "Referrer: " + sanitizedUrl);
 
-    return new ResponseEntity<>("Redirecting to: " + url, headers, HttpStatus.FOUND);
+    return new ResponseEntity<>("Redirecting to: " + sanitizedUrl, headers, HttpStatus.FOUND);
+  }
+
+  /**
+   * Sanitizes and validates a URL to prevent header injection.
+   *
+   * @param url The URL to sanitize
+   * @return The sanitized URL or null if the URL is invalid
+   */
+  private String sanitizeUrl(String url) {
+    if (url == null || url.isEmpty()) {
+      return null;
+    }
+
+    // Remove any CR or LF characters that could lead to header injection
+    String sanitized = url.replaceAll("[\r\n]", "");
+
+    try {
+      // Validate URL format
+      URI uri = new URI(sanitized);
+      String scheme = uri.getScheme();
+
+      // Ensure URL has a valid scheme (http or https)
+      if (scheme == null || !(scheme.equals("http") || scheme.equals("https"))) {
+        return null;
+      }
+
+      return sanitized;
+    } catch (URISyntaxException e) {
+      return null;
+    }
   }
 
   @PostMapping("/update-account")
