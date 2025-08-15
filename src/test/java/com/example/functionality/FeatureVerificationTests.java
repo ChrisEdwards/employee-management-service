@@ -27,7 +27,8 @@ public class FeatureVerificationTests {
             .andReturn();
 
     String content = result.getResponse().getContentAsString();
-    assertFalse(content.contains("Error: Command not allowed"), "Should execute command and return output");
+    assertFalse(
+        content.contains("Error: Command not allowed"), "Should execute command and return output");
   }
 
   @Test
