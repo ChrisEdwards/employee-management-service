@@ -70,7 +70,7 @@ public class EmployeeServiceTest {
     assertThat(actualUsers.size()).isEqualTo(1);
     assertThat(actualUsers.get(0).getUsername()).isEqualTo("testuser");
     assertThat(actualUsers.get(0).getEmail()).isEqualTo("test@example.com");
-    
+
     // Verify the prepared statement was used correctly
     verify(preparedStatement).setString(1, "testuser");
   }
