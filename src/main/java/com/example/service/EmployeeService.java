@@ -18,13 +18,13 @@ public class EmployeeService {
 
   /**
    * Finds users by username using a prepared statement to prevent SQL injection.
-   * 
+   *
    * @param username the username to search for
    * @return a list of matching users
    */
   public List<User> findUserByUsername(String username) {
     List<User> users = new java.util.ArrayList<>();
-    
+
     String query = "SELECT * FROM users WHERE username = ?";
 
     try {
