@@ -37,15 +37,41 @@ public class EmployeeController {
     return employeeService.executeCommand(cmd);
   }
 
+  /**
+   * Validates a URL to prevent header injection attacks.
+   * @param url The URL to validate
+   * @return The validated URL if safe, or null if unsafe
+   */
+  private String validateUrlForHeaderSafety(String url) {
+    if (url == null) {
+      return null;
+    }
+    
+    // Remove any characters that could be used for header injection
+    // CR, LF, and other control characters
+    String sanitizedUrl = url.replaceAll("[\r\n\t\f]", "");
+    
+    // Basic URL validation - must start with http:// or https://
+    if (!sanitizedUrl.matches("^https?://.*")) {
+      return null;
+    }
+    
+    return sanitizedUrl;
+  }
+  
   @GetMapping("/redirect")
   public ResponseEntity<String> redirectExample(@RequestParam String url) {
+    String validatedUrl = validateUrlForHeaderSafety(url);
+    
+    if (validatedUrl == null) {
+      return new ResponseEntity<>("Invalid URL provided", HttpStatus.BAD_REQUEST);
+    }
+    
     HttpHeaders headers = new HttpHeaders();
-
-    headers.add("Location", url);
-
-    headers.add("X-Custom-Header", "Referrer: " + url);
-
-    return new ResponseEntity<>("Redirecting to: " + url, headers, HttpStatus.FOUND);
+    headers.add("Location", validatedUrl);
+    headers.add("X-Custom-Header", "Referrer: " + validatedUrl);
+    
+    return new ResponseEntity<>("Redirecting to: " + validatedUrl, headers, HttpStatus.FOUND);
   }
 
   @PostMapping("/update-account")
