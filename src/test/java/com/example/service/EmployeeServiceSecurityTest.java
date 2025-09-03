@@ -2,7 +2,6 @@ package com.example.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,14 +49,14 @@ public class EmployeeServiceSecurityTest {
   public void testFindUserByUsername_PreventsSqlInjection() throws SQLException {
     // Setup - SQL injection attempt
     String maliciousInput = "' OR '1'='1";
-    
+
     // Execute the method with malicious input
     employeeService.findUserByUsername(maliciousInput);
-    
+
     // Verify that the input was properly parameterized
     verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
     verify(preparedStatement).setString(1, maliciousInput);
-    
+
     // The SQL injection attempt should be treated as a literal string parameter
     // and not change the query structure
   }
@@ -66,19 +65,19 @@ public class EmployeeServiceSecurityTest {
   public void testFindUserByUsername_HandlesSpecialCharacters() throws SQLException {
     // Setup - username with special characters
     String usernameWithSpecialChars = "user@example.com; DROP TABLE users;";
-    
+
     // Configure ResultSet to return a user
     when(resultSet.next()).thenReturn(true, false);
     when(resultSet.getLong("id")).thenReturn(1L);
     when(resultSet.getString("username")).thenReturn(usernameWithSpecialChars);
     when(resultSet.getString("email")).thenReturn("test@example.com");
-    
+
     // Execute
     List<User> users = employeeService.findUserByUsername(usernameWithSpecialChars);
-    
+
     // Verify parameterized query was used correctly
     verify(preparedStatement).setString(1, usernameWithSpecialChars);
-    
+
     // Verify result
     assertThat(users).hasSize(1);
     assertThat(users.get(0).getUsername()).isEqualTo(usernameWithSpecialChars);

@@ -2,12 +2,13 @@ package com.example.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -31,7 +32,7 @@ public class EmployeeServiceTest {
 
   @Mock private Connection connection;
 
-  @Mock private Statement statement;
+  @Mock private PreparedStatement preparedStatement;
 
   @Mock private ResultSet resultSet;
 
@@ -43,8 +44,8 @@ public class EmployeeServiceTest {
 
     // Configure the mock DataSource
     when(dataSource.getConnection()).thenReturn(connection);
-    when(connection.createStatement()).thenReturn(statement);
-    when(statement.executeQuery(anyString())).thenReturn(resultSet);
+    when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+    when(preparedStatement.executeQuery()).thenReturn(resultSet);
 
     // Mock the ResultSet to return no results by default
     when(resultSet.next()).thenReturn(false);
@@ -63,6 +64,10 @@ public class EmployeeServiceTest {
 
     // Test
     List<User> actualUsers = employeeService.findUserByUsername("testuser");
+
+    // Verify parameterized query was used correctly
+    verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
+    verify(preparedStatement).setString(1, "testuser");
 
     // Verify
     assertThat(actualUsers).isNotEmpty();
