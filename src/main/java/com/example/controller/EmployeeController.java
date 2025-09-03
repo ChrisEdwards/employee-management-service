@@ -58,7 +58,7 @@ public class EmployeeController {
         break;
       }
     }
-    
+
     String sanitizedUrl = url.substring(0, endOfUrl);
 
     // Basic URL validation - must start with http:// or https://
