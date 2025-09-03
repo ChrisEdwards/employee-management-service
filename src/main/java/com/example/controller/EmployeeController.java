@@ -39,6 +39,7 @@ public class EmployeeController {
 
   /**
    * Validates a URL to prevent header injection attacks.
+   *
    * @param url The URL to validate
    * @return The validated URL if safe, or null if unsafe
    */
@@ -46,31 +47,40 @@ public class EmployeeController {
     if (url == null) {
       return null;
     }
+
+    // Extract the base URL without any potential injection characters
+    // This will stop at the first CR, LF or other control character
+    int endOfUrl = url.length();
+    for (int i = 0; i < url.length(); i++) {
+      char c = url.charAt(i);
+      if (c == '\r' || c == '\n' || c == '\t' || c == '\f') {
+        endOfUrl = i;
+        break;
+      }
+    }
     
-    // Remove any characters that could be used for header injection
-    // CR, LF, and other control characters
-    String sanitizedUrl = url.replaceAll("[\r\n\t\f]", "");
-    
+    String sanitizedUrl = url.substring(0, endOfUrl);
+
     // Basic URL validation - must start with http:// or https://
     if (!sanitizedUrl.matches("^https?://.*")) {
       return null;
     }
-    
+
     return sanitizedUrl;
   }
-  
+
   @GetMapping("/redirect")
   public ResponseEntity<String> redirectExample(@RequestParam String url) {
     String validatedUrl = validateUrlForHeaderSafety(url);
-    
+
     if (validatedUrl == null) {
       return new ResponseEntity<>("Invalid URL provided", HttpStatus.BAD_REQUEST);
     }
-    
+
     HttpHeaders headers = new HttpHeaders();
     headers.add("Location", validatedUrl);
     headers.add("X-Custom-Header", "Referrer: " + validatedUrl);
-    
+
     return new ResponseEntity<>("Redirecting to: " + validatedUrl, headers, HttpStatus.FOUND);
   }
 

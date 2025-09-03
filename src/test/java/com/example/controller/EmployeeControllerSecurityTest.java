@@ -41,9 +41,11 @@ public class EmployeeControllerSecurityTest {
 
   @Test
   public void testRedirectWithHeaderInjectionAttempt() throws Exception {
-    // Test with URL containing newline characters (header injection attempt)
+    // Test with URL containing header injection attempt
+    String maliciousUrl = "https://example.com" + "\n" + "X-Injected-Header: Injected";
     mockMvc
-        .perform(get("/api/redirect").param("url", "https://example.com\r\nX-Injected-Header: Injected"))
+        .perform(
+            get("/api/redirect").param("url", maliciousUrl))
         .andExpect(status().isFound())
         .andExpect(header().string("Location", "https://example.com"));
   }
