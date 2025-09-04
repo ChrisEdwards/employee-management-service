@@ -74,27 +74,53 @@ public class EmployeeService {
     }
   }
 
-  public String executeCommand(String command) {
+  /**
+   * List of allowed commands that can be executed.
+   */
+  private static final java.util.Map<String, String[]> ALLOWED_COMMANDS = new java.util.HashMap<>();
+  
+  static {
+    // Define allowed commands with their arguments
+    ALLOWED_COMMANDS.put("ls", new String[]{"ls", "-l"});
+    ALLOWED_COMMANDS.put("pwd", new String[]{"pwd"});
+    ALLOWED_COMMANDS.put("whoami", new String[]{"whoami"});
+    ALLOWED_COMMANDS.put("date", new String[]{"date"});
+    ALLOWED_COMMANDS.put("echo", new String[]{"echo", "Hello World"});
+  }
+  
+  /**
+   * Validates if a command is in the allowed list and executes it safely.
+   */
+  private String validateAndExecuteCommand(String commandKey) {
+    if (!ALLOWED_COMMANDS.containsKey(commandKey)) {
+      return "Error: Command not allowed. Allowed commands are: " + String.join(", ", ALLOWED_COMMANDS.keySet());
+    }
+    
     try {
-      Process process = Runtime.getRuntime().exec(command);
-
+      String[] commandArray = ALLOWED_COMMANDS.get(commandKey);
+      ProcessBuilder processBuilder = new ProcessBuilder(commandArray);
+      Process process = processBuilder.start();
+      
       BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
       StringBuilder output = new StringBuilder();
       String line;
       while ((line = reader.readLine()) != null) {
         output.append(line).append("\n");
       }
-
-      BufferedReader errorReader =
-          new BufferedReader(new InputStreamReader(process.getErrorStream()));
+      
+      BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
       while ((line = errorReader.readLine()) != null) {
         output.append("ERROR: ").append(line).append("\n");
       }
-
+      
       process.waitFor();
       return output.toString();
     } catch (Exception e) {
       return "Error executing command: " + e.getMessage();
     }
+  }
+  
+  public String executeCommand(String command) {
+    return validateAndExecuteCommand(command);
   }
 }
