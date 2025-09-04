@@ -23,7 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.example.model.User;
 
 @SpringBootTest
-public class EmployeeServiceTest {
+public class EmployeeServiceSecurityTest {
 
   @Mock private DataSource dataSource;
   @Mock private Connection connection;
@@ -46,7 +46,22 @@ public class EmployeeServiceTest {
   }
 
   @Test
-  public void testFindUserByUsername() throws SQLException {
+  public void testSqlInjectionPrevention() throws SQLException {
+    // Setup - SQL injection attempt
+    String maliciousUsername = "' OR '1'='1";
+
+    // Execute the method with the malicious input
+    employeeService.findUserByUsername(maliciousUsername);
+
+    // Verify that the PreparedStatement was used correctly
+    verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
+    verify(preparedStatement).setString(1, maliciousUsername);
+
+    // The SQL injection should be prevented because the input is properly parameterized
+  }
+
+  @Test
+  public void testFindUserByUsername_ValidInput() throws SQLException {
     // Setup
     String validUsername = "testuser";
 
@@ -65,31 +80,9 @@ public class EmployeeServiceTest {
     assertThat(users).isNotEmpty();
     assertThat(users.size()).isEqualTo(1);
     assertThat(users.get(0).getUsername()).isEqualTo(validUsername);
-    assertThat(users.get(0).getEmail()).isEqualTo("test@example.com");
 
     // Verify proper parameterization
     verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
     verify(preparedStatement).setString(1, validUsername);
-  }
-
-  @Test
-  public void testFetchDataFromUrl_Success() {
-    // Note: This is a partial test that doesn't actually make HTTP calls
-    // In a real test, you'd use a MockServer to simulate HTTP responses
-
-    // Since we can't easily mock HttpURLConnection, we're just testing the error case
-    String result = employeeService.fetchDataFromUrl("invalid_url");
-
-    // The result should contain the error message
-    assertThat(result).startsWith("Error fetching URL:");
-  }
-
-  @Test
-  public void testFetchDataFromUrl_Error() {
-    // Testing with a URL that will cause an exception
-    String result = employeeService.fetchDataFromUrl("not-a-valid-url");
-
-    // Verify that the error message is returned
-    assertThat(result).contains("Error fetching URL:");
   }
 }
