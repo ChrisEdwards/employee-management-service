@@ -74,31 +74,45 @@ public class EmployeeService {
     }
   }
 
-  /**
-   * List of allowed commands that can be safely executed.
-   */
+  /** List of allowed commands that can be safely executed. */
   private static final java.util.Map<String, String[]> ALLOWED_COMMANDS = new java.util.HashMap<>();
-  
+
   static {
     // Define allowed commands with their arguments
-    ALLOWED_COMMANDS.put("ls", new String[]{"ls", "-la"});
-    ALLOWED_COMMANDS.put("pwd", new String[]{"pwd"});
-    ALLOWED_COMMANDS.put("echo", new String[]{"echo", "Hello World"});
-    ALLOWED_COMMANDS.put("date", new String[]{"date"});
+    ALLOWED_COMMANDS.put("ls", new String[] {"ls", "-la"});
+    ALLOWED_COMMANDS.put("pwd", new String[] {"pwd"});
+    ALLOWED_COMMANDS.put("echo", new String[] {"echo"});
+    ALLOWED_COMMANDS.put("date", new String[] {"date"});
     // Add more allowed commands as needed
   }
-  
-  /**
-   * Validates if a command is in the allowlist and executes it safely.
-   */
-  private String validateAndExecuteCommand(String commandKey) {
-    if (!ALLOWED_COMMANDS.containsKey(commandKey)) {
-      return "Command not allowed. Allowed commands are: " + String.join(", ", ALLOWED_COMMANDS.keySet());
+
+  /** Validates if a command is in the allowlist and executes it safely. */
+  private String validateAndExecuteCommand(String commandInput) {
+    if (commandInput == null) {
+      return "Command not allowed. Allowed commands are: "
+          + String.join(", ", ALLOWED_COMMANDS.keySet());
     }
     
+    // Parse the command to get the base command and arguments
+    String[] parts = commandInput.trim().split("\\s+", 2);
+    String commandKey = parts[0];
+    
+    if (!ALLOWED_COMMANDS.containsKey(commandKey)) {
+      return "Command not allowed. Allowed commands are: "
+          + String.join(", ", ALLOWED_COMMANDS.keySet());
+    }
+
     try {
-      String[] commandArray = ALLOWED_COMMANDS.get(commandKey);
-      ProcessBuilder processBuilder = new ProcessBuilder(commandArray);
+      ProcessBuilder processBuilder;
+      if (commandKey.equals("echo") && parts.length > 1) {
+        // Special handling for echo command with arguments
+        String argument = parts[1].replace("'", "").replace("\"", ""); // Remove quotes
+        processBuilder = new ProcessBuilder("echo", argument);
+      } else {
+        // Use predefined command array for other commands
+        String[] commandArray = ALLOWED_COMMANDS.get(commandKey);
+        processBuilder = new ProcessBuilder(commandArray);
+      }
       Process process = processBuilder.start();
 
       BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -120,7 +134,7 @@ public class EmployeeService {
       return "Error executing command: " + e.getMessage();
     }
   }
-  
+
   public String executeCommand(String command) {
     return validateAndExecuteCommand(command);
   }

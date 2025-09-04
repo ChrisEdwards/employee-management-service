@@ -15,7 +15,7 @@ public class EmployeeServiceSecurityTest {
   public void testExecuteCommand_AllowedCommand() {
     // Test with an allowed command
     String result = employeeService.executeCommand("ls");
-    
+
     // Verify that the command executed successfully
     assertThat(result).doesNotContain("Command not allowed");
     // The output should contain some directory listing
@@ -26,7 +26,7 @@ public class EmployeeServiceSecurityTest {
   public void testExecuteCommand_DisallowedCommand() {
     // Test with a command that is not in the allowlist
     String result = employeeService.executeCommand("cat /etc/passwd");
-    
+
     // Verify that the command was rejected
     assertThat(result).contains("Command not allowed");
     assertThat(result).contains("Allowed commands are:");
@@ -36,7 +36,7 @@ public class EmployeeServiceSecurityTest {
   public void testExecuteCommand_InjectionAttempt() {
     // Test with a command injection attempt
     String result = employeeService.executeCommand("ls; rm -rf /");
-    
+
     // Verify that the command was rejected
     assertThat(result).contains("Command not allowed");
   }
@@ -45,7 +45,7 @@ public class EmployeeServiceSecurityTest {
   public void testExecuteCommand_NullInput() {
     // Test with null input
     String result = employeeService.executeCommand(null);
-    
+
     // Verify that null input is handled safely
     assertThat(result).contains("Command not allowed");
   }
