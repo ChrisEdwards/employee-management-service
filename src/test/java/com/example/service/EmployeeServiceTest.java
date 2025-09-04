@@ -2,12 +2,14 @@ package com.example.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -20,19 +22,13 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.example.model.User;
-import com.example.repository.UserRepository;
 
 @SpringBootTest
 public class EmployeeServiceTest {
 
-  @Mock private UserRepository userRepository;
-
   @Mock private DataSource dataSource;
-
   @Mock private Connection connection;
-
-  @Mock private Statement statement;
-
+  @Mock private PreparedStatement preparedStatement;
   @Mock private ResultSet resultSet;
 
   @InjectMocks private EmployeeService employeeService;
@@ -43,8 +39,8 @@ public class EmployeeServiceTest {
 
     // Configure the mock DataSource
     when(dataSource.getConnection()).thenReturn(connection);
-    when(connection.createStatement()).thenReturn(statement);
-    when(statement.executeQuery(anyString())).thenReturn(resultSet);
+    when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+    when(preparedStatement.executeQuery()).thenReturn(resultSet);
 
     // Mock the ResultSet to return no results by default
     when(resultSet.next()).thenReturn(false);
@@ -53,22 +49,28 @@ public class EmployeeServiceTest {
   @Test
   public void testFindUserByUsername() throws SQLException {
     // Setup
+    String validUsername = "testuser";
+
     // Configure ResultSet to return a single user
     when(resultSet.next())
         .thenReturn(true, false); // Return true first time, then false to end loop
     when(resultSet.getLong("id")).thenReturn(1L);
-    when(resultSet.getString("username")).thenReturn("testuser");
+    when(resultSet.getString("username")).thenReturn(validUsername);
     when(resultSet.getString("password")).thenReturn("password");
     when(resultSet.getString("email")).thenReturn("test@example.com");
 
-    // Test
-    List<User> actualUsers = employeeService.findUserByUsername("testuser");
+    // Execute
+    List<User> users = employeeService.findUserByUsername(validUsername);
 
     // Verify
-    assertThat(actualUsers).isNotEmpty();
-    assertThat(actualUsers.size()).isEqualTo(1);
-    assertThat(actualUsers.get(0).getUsername()).isEqualTo("testuser");
-    assertThat(actualUsers.get(0).getEmail()).isEqualTo("test@example.com");
+    assertThat(users).isNotEmpty();
+    assertThat(users.size()).isEqualTo(1);
+    assertThat(users.get(0).getUsername()).isEqualTo(validUsername);
+    assertThat(users.get(0).getEmail()).isEqualTo("test@example.com");
+
+    // Verify proper parameterization
+    verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
+    verify(preparedStatement).setString(1, validUsername);
   }
 
   @Test
