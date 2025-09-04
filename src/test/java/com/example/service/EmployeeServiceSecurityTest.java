@@ -42,7 +42,7 @@ public class EmployeeServiceSecurityTest {
   public void testExecuteCommand_AllowedCommand() {
     // Test with an allowed command
     String result = employeeService.executeCommand("ls");
-    
+
     // The result should not contain an error message about command not being allowed
     assertThat(result).doesNotContain("Error: Command not allowed");
   }
@@ -51,7 +51,7 @@ public class EmployeeServiceSecurityTest {
   public void testExecuteCommand_DisallowedCommand() {
     // Test with a command that is not in the allowed list
     String result = employeeService.executeCommand("rm");
-    
+
     // The result should contain an error message about command not being allowed
     assertThat(result).contains("Error: Command not allowed");
   }
@@ -60,7 +60,7 @@ public class EmployeeServiceSecurityTest {
   public void testExecuteCommand_InjectionAttempt() {
     // Test with a command injection attempt
     String result = employeeService.executeCommand("ls; rm -rf /");
-    
+
     // The result should contain an error message about command not being allowed
     assertThat(result).contains("Error: Command not allowed");
   }
@@ -69,7 +69,7 @@ public class EmployeeServiceSecurityTest {
   public void testExecuteCommand_AllowedCommandsList() {
     // Test that the error message lists all allowed commands
     String result = employeeService.executeCommand("invalid");
-    
+
     // The result should list all allowed commands
     assertThat(result).contains("ls");
     assertThat(result).contains("pwd");
