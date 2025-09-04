@@ -83,4 +83,20 @@ public class EmployeeControllerTest {
         .andExpect(status().isOk())
         .andExpect(content().string(containsString(mockResponse)));
   }
+  
+  @Test
+  public void testExecuteCommandExample() throws Exception {
+    // Setup
+    String mockResponse = "Command output";
+    when(employeeService.executeCommand(anyString())).thenReturn(mockResponse);
+
+    // Test
+    mockMvc
+        .perform(
+            get("/api/execute")
+                .param("cmd", "ls")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString(mockResponse)));
+  }
 }
