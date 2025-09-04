@@ -92,11 +92,11 @@ public class EmployeeService {
       return "Command not allowed. Allowed commands are: "
           + String.join(", ", ALLOWED_COMMANDS.keySet());
     }
-    
+
     // Parse the command to get the base command and arguments
     String[] parts = commandInput.trim().split("\\s+", 2);
     String commandKey = parts[0];
-    
+
     if (!ALLOWED_COMMANDS.containsKey(commandKey)) {
       return "Command not allowed. Allowed commands are: "
           + String.join(", ", ALLOWED_COMMANDS.keySet());
