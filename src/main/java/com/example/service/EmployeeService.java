@@ -91,13 +91,17 @@ public class EmployeeService {
 
     // Extract the base command (first word before any space or special character)
     String baseCommand = command.trim().split("[\\s;|&]")[0];
-    
+
     // Check if the command contains any shell special characters that could be used for injection
-    if (command.contains(";") || command.contains("|") || command.contains("&") || 
-        command.contains(">") || command.contains("<") || command.contains("`")) {
+    if (command.contains(";")
+        || command.contains("|")
+        || command.contains("&")
+        || command.contains(">")
+        || command.contains("<")
+        || command.contains("`")) {
       return false;
     }
-    
+
     return ALLOWED_COMMANDS.contains(baseCommand);
   }
 
