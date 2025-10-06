@@ -33,10 +33,7 @@ public class EmployeeControllerSecurityTest {
 
     // Test
     mockMvc
-        .perform(
-            get("/api/execute")
-                .param("cmd", "ls")
-                .contentType(MediaType.APPLICATION_JSON))
+        .perform(get("/api/execute").param("cmd", "ls").contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().string(allowedCommandResponse));
   }
