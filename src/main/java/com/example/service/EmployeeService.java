@@ -74,9 +74,34 @@ public class EmployeeService {
     }
   }
 
+  private static final java.util.Set<String> ALLOWED_COMMANDS = new java.util.HashSet<>(java.util.Arrays.asList(
+      "ls", "pwd", "echo", "date", "whoami", "hostname"
+  ));
+
+  /**
+   * Validates if a command is allowed to execute
+   * @param command The command to validate
+   * @return true if the command is in the allowlist, false otherwise
+   */
+  private boolean isCommandAllowed(String command) {
+    if (command == null || command.trim().isEmpty()) {
+      return false;
+    }
+    
+    // Extract the base command (first word before any space or special character)
+    String baseCommand = command.trim().split("[\\s;|&]")[0];
+    return ALLOWED_COMMANDS.contains(baseCommand);
+  }
+
   public String executeCommand(String command) {
+    if (!isCommandAllowed(command)) {
+      return "Command not allowed for security reasons. Allowed commands: " + String.join(", ", ALLOWED_COMMANDS);
+    }
+    
     try {
-      Process process = Runtime.getRuntime().exec(command);
+      ProcessBuilder processBuilder = new ProcessBuilder();
+      processBuilder.command("sh", "-c", command);
+      Process process = processBuilder.start();
 
       BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
       StringBuilder output = new StringBuilder();
