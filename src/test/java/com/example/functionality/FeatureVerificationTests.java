@@ -27,6 +27,7 @@ public class FeatureVerificationTests {
             .andReturn();
 
     String content = result.getResponse().getContentAsString();
+    // The command is now in the allowlist, so it should contain Success
     assertTrue(content.contains("Success"), "Should execute command and return output");
   }
 

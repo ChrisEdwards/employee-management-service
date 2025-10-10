@@ -1,6 +1,5 @@
 package com.example.controller;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -46,7 +45,8 @@ public class EmployeeControllerSecurityTest {
   public void testExecuteCommandExample_DisallowedCommand() throws Exception {
     // Setup
     String disallowedCommand = "rm -rf /";
-    String securityMessage = "Command not allowed for security reasons. Only specific commands are permitted.";
+    String securityMessage =
+        "Command not allowed for security reasons. Only specific commands are permitted.";
     when(employeeService.executeCommand(disallowedCommand)).thenReturn(securityMessage);
 
     // Test
@@ -63,7 +63,8 @@ public class EmployeeControllerSecurityTest {
   public void testExecuteCommandExample_CommandInjectionAttempt() throws Exception {
     // Setup
     String injectionAttempt = "ls; rm -rf /";
-    String securityMessage = "Command not allowed for security reasons. Only specific commands are permitted.";
+    String securityMessage =
+        "Command not allowed for security reasons. Only specific commands are permitted.";
     when(employeeService.executeCommand(injectionAttempt)).thenReturn(securityMessage);
 
     // Test
