@@ -83,7 +83,16 @@ public class EmployeeService {
   private boolean isCommandAllowed(String command) {
     // Define an allowlist of permitted commands
     final java.util.Set<String> ALLOWED_COMMANDS =
-        java.util.Set.of("ls", "ls -l", "ls -la", "pwd", "date", "whoami", "echo hello", "uptime", "echo 'Success'");
+        java.util.Set.of(
+            "ls",
+            "ls -l",
+            "ls -la",
+            "pwd",
+            "date",
+            "whoami",
+            "echo hello",
+            "uptime",
+            "echo 'Success'");
 
     // Check if the command is in the allowlist
     return ALLOWED_COMMANDS.contains(command.trim());
