@@ -2,7 +2,6 @@ package com.example.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,7 +56,7 @@ public class EmployeeServiceSecurityTest {
     // Verify that the PreparedStatement was used correctly
     verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
     verify(preparedStatement).setString(1, maliciousInput);
-    
+
     // This verifies that the malicious input is safely parameterized
     // and not directly concatenated into the SQL query
   }
@@ -77,7 +76,7 @@ public class EmployeeServiceSecurityTest {
 
     // Verify the parameter was properly set in the prepared statement
     verify(preparedStatement).setString(1, specialCharInput);
-    
+
     // Verify the result
     assertThat(users).isNotEmpty();
     assertThat(users.size()).isEqualTo(1);

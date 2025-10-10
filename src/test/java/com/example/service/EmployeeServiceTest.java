@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -31,7 +31,7 @@ public class EmployeeServiceTest {
 
   @Mock private Connection connection;
 
-  @Mock private Statement statement;
+  @Mock private PreparedStatement statement;
 
   @Mock private ResultSet resultSet;
 

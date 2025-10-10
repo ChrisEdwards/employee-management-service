@@ -16,9 +16,7 @@ public class EmployeeService {
 
   @Autowired private javax.sql.DataSource dataSource;
 
-  /**
-   * Safely finds users by username using a prepared statement to prevent SQL injection.
-   */
+  /** Safely finds users by username using a prepared statement to prevent SQL injection. */
   public List<User> findUserByUsername(String username) {
     List<User> users = new java.util.ArrayList<>();
 
