@@ -39,7 +39,7 @@ public class EmployeeController {
 
   /**
    * Validates if a URL is properly formatted and safe for use in headers.
-   * 
+   *
    * @param url The URL to validate
    * @return true if the URL is valid, false otherwise
    */
@@ -47,17 +47,17 @@ public class EmployeeController {
     if (url == null || url.isEmpty()) {
       return false;
     }
-    
+
     try {
       // Validate URL format
       java.net.URL urlObj = new java.net.URL(url);
-      
+
       // Check for common protocols
       String protocol = urlObj.getProtocol().toLowerCase();
       if (!protocol.equals("http") && !protocol.equals("https")) {
         return false;
       }
-      
+
       // Ensure no CR/LF characters that could lead to header injection
       return !url.contains("\r") && !url.contains("\n");
     } catch (java.net.MalformedURLException e) {
@@ -70,7 +70,7 @@ public class EmployeeController {
     if (!isValidRedirectUrl(url)) {
       return new ResponseEntity<>("Invalid redirect URL", HttpStatus.BAD_REQUEST);
     }
-    
+
     HttpHeaders headers = new HttpHeaders();
     headers.add("Location", url);
     headers.add("X-Custom-Header", "Referrer: " + url);
