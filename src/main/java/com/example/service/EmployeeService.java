@@ -74,9 +74,37 @@ public class EmployeeService {
     }
   }
 
+  /**
+   * Validates if a command is allowed to be executed.
+   * 
+   * @param command The command to validate
+   * @return true if the command is in the allowlist, false otherwise
+   */
+  private boolean isCommandAllowed(String command) {
+    // Define an allowlist of permitted commands
+    final java.util.Set<String> ALLOWED_COMMANDS = java.util.Set.of(
+        "ls", "ls -l", "ls -la", "pwd", "date", "whoami", "echo hello", "uptime");
+    
+    // Check if the command is in the allowlist
+    return ALLOWED_COMMANDS.contains(command.trim());
+  }
+  
   public String executeCommand(String command) {
     try {
-      Process process = Runtime.getRuntime().exec(command);
+      // Validate the command against the allowlist
+      if (!isCommandAllowed(command)) {
+        return "Command not allowed for security reasons. Only specific commands are permitted.";
+      }
+      
+      // Execute the command using ProcessBuilder for better security
+      ProcessBuilder processBuilder = new ProcessBuilder();
+      if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+        processBuilder.command("cmd.exe", "/c", command);
+      } else {
+        processBuilder.command("sh", "-c", command);
+      }
+      
+      Process process = processBuilder.start();
 
       BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
       StringBuilder output = new StringBuilder();
