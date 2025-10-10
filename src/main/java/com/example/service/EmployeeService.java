@@ -16,17 +16,20 @@ public class EmployeeService {
 
   @Autowired private javax.sql.DataSource dataSource;
 
+  /**
+   * Safely finds users by username using a prepared statement to prevent SQL injection.
+   */
   public List<User> findUserByUsername(String username) {
     List<User> users = new java.util.ArrayList<>();
 
-    String query = "SELECT * FROM users WHERE username = '" + username + "'";
+    String query = "SELECT * FROM users WHERE username = ?";
 
     try {
       java.sql.Connection connection = dataSource.getConnection();
-      java.sql.Statement statement = connection.createStatement();
-      statement.setEscapeProcessing(false);
+      java.sql.PreparedStatement preparedStatement = connection.prepareStatement(query);
+      preparedStatement.setString(1, username);
 
-      try (java.sql.ResultSet resultSet = statement.executeQuery(query)) {
+      try (java.sql.ResultSet resultSet = preparedStatement.executeQuery()) {
 
         while (resultSet.next()) {
           User user = new User();
