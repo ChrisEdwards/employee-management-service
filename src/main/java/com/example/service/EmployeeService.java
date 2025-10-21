@@ -20,12 +20,20 @@ public class EmployeeService {
   public List<User> findUserByUsername(String username) {
     List<User> users = new java.util.ArrayList<>();
 
+    // Input validation to prevent null/empty values
+    if (username == null || username.trim().isEmpty()) {
+      return users;
+    }
+
+    // Sanitize username to prevent potential issues
+    String sanitizedUsername = sanitizeUsername(username);
+
     String query = "SELECT * FROM users WHERE username = ?";
 
     try {
       java.sql.Connection connection = dataSource.getConnection();
       java.sql.PreparedStatement preparedStatement = connection.prepareStatement(query);
-      preparedStatement.setString(1, username);
+      preparedStatement.setString(1, sanitizedUsername);
 
       try (java.sql.ResultSet resultSet = preparedStatement.executeQuery()) {
 
@@ -51,6 +59,20 @@ public class EmployeeService {
     }
 
     return users;
+  }
+
+  /**
+   * Sanitizes username input to prevent potential security issues.
+   * This method provides an additional layer of security beyond prepared statements.
+   */
+  private String sanitizeUsername(String username) {
+    if (username == null) {
+      return null;
+    }
+    
+    // Remove potentially dangerous characters while preserving valid username characters
+    // Allow alphanumeric, underscore, hyphen, dot, and @ symbol for email-style usernames
+    return username.replaceAll("[^a-zA-Z0-9._@-]", "").trim();
   }
 
   public String fetchDataFromUrl(String url) {

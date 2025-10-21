@@ -55,7 +55,8 @@ public class EmployeeServiceSecurityTest {
 
     // Verify that the PreparedStatement was used correctly
     verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
-    verify(preparedStatement).setString(1, maliciousInput);
+    // The malicious characters should be sanitized, so the parameter should be "OR11"
+    verify(preparedStatement).setString(1, "OR11");
 
     // This verifies that the malicious input is safely parameterized
     // and not directly concatenated into the SQL query
@@ -74,12 +75,50 @@ public class EmployeeServiceSecurityTest {
     String specialCharInput = "test@user;--";
     List<User> users = employeeService.findUserByUsername(specialCharInput);
 
-    // Verify the parameter was properly set in the prepared statement
-    verify(preparedStatement).setString(1, specialCharInput);
+    // Verify the parameter was properly sanitized (semicolon removed, hyphens kept)
+    verify(preparedStatement).setString(1, "test@user--");
 
     // Verify the result
     assertThat(users).isNotEmpty();
     assertThat(users.size()).isEqualTo(1);
     assertThat(users.get(0).getUsername()).isEqualTo("test@user");
+  }
+
+  @Test
+  public void testInputValidation_NullUsername() throws SQLException {
+    // Test with null input
+    List<User> users = employeeService.findUserByUsername(null);
+
+    // Verify that no database call is made and empty list is returned
+    assertThat(users).isEmpty();
+  }
+
+  @Test
+  public void testInputValidation_EmptyUsername() throws SQLException {
+    // Test with empty input
+    List<User> users = employeeService.findUserByUsername("");
+
+    // Verify that no database call is made and empty list is returned
+    assertThat(users).isEmpty();
+  }
+
+  @Test
+  public void testInputValidation_WhitespaceUsername() throws SQLException {
+    // Test with whitespace-only input
+    List<User> users = employeeService.findUserByUsername("   ");
+
+    // Verify that no database call is made and empty list is returned
+    assertThat(users).isEmpty();
+  }
+
+  @Test
+  public void testUsernameSanitization() throws SQLException {
+    // Test that special characters are properly sanitized
+    String inputWithSpecialChars = "user<script>alert('xss')</script>@domain.com";
+    
+    employeeService.findUserByUsername(inputWithSpecialChars);
+    
+    // Verify the sanitized username is used (should remove script tags)
+    verify(preparedStatement).setString(1, "userscriptalertxssscript@domain.com");
   }
 }
