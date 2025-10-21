@@ -115,9 +115,9 @@ public class EmployeeServiceSecurityTest {
   public void testUsernameSanitization() throws SQLException {
     // Test that special characters are properly sanitized
     String inputWithSpecialChars = "user<script>alert('xss')</script>@domain.com";
-    
+
     employeeService.findUserByUsername(inputWithSpecialChars);
-    
+
     // Verify the sanitized username is used (should remove script tags)
     verify(preparedStatement).setString(1, "userscriptalertxssscript@domain.com");
   }

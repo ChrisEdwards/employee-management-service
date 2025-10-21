@@ -62,14 +62,14 @@ public class EmployeeService {
   }
 
   /**
-   * Sanitizes username input to prevent potential security issues.
-   * This method provides an additional layer of security beyond prepared statements.
+   * Sanitizes username input to prevent potential security issues. This method provides an
+   * additional layer of security beyond prepared statements.
    */
   private String sanitizeUsername(String username) {
     if (username == null) {
       return null;
     }
-    
+
     // Remove potentially dangerous characters while preserving valid username characters
     // Allow alphanumeric, underscore, hyphen, dot, and @ symbol for email-style usernames
     return username.replaceAll("[^a-zA-Z0-9._@-]", "").trim();
