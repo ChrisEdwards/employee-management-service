@@ -34,9 +34,7 @@ jobs:
           fetch-depth: 0
           
       - name: Run Contrast AI SmartFix - Generate Fixes Action
-        uses: Contrast-Security-OSS/contrast-ai-smartfix-action@v1 # Replace with the latest version
-        env:
-          AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
+        uses: Contrast-Security-OSS/contrast-ai-smartfix-action@AIML-195 # Replace with the latest version
         with:
           # Contrast Configuration
           contrast_host: ${{ vars.CONTRAST_HOST }} # The host name of your Contrast SaaS instance, e.g. 'app.contrastsecurity.com'
@@ -56,7 +54,7 @@ jobs:
           # LLM Configuration (Bring Your Own LLM)
           # Choose ONE LLM provider and configure its credentials
           # Recommended: Anthropic Claude Sonnet
-
+          
           # Claude Via Direct Anthropic API
           #agent_model: 'anthropic/claude-sonnet-4-20250514' # Check LiteLLM docs for exact model string
           #anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -64,6 +62,8 @@ jobs:
           # Claude Via AWS Bedrock
           # Setup AWS credentials in the earlier "Configure AWS Credentials" step.
           agent_model: 'bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0' # Example for Claude Sonnet on Bedrock
+          aws_bearer_token_bedrock: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
+          aws_region: 'us-east-2'
           
           # Experimental: Google Gemini Pro
           # agent_model: 'gemini/gemini-2.5-pro-preview-05-06' # Check LiteLLM docs for exact model string
