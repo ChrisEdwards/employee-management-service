@@ -56,12 +56,12 @@ jobs:
           # Recommended: Anthropic Claude Sonnet
 
           # Claude Via Direct Anthropic API
-          agent_model: 'anthropic/claude-sonnet-4-20250514' # Check LiteLLM docs for exact model string
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          #agent_model: 'anthropic/claude-sonnet-4-20250514' # Check LiteLLM docs for exact model string
+          #anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 
           # Claude Via AWS Bedrock
           # Setup AWS credentials in the earlier "Configure AWS Credentials" step.
-          #agent_model: 'bedrock/us.anthropic.claude-3-7-sonnet-20250219-v1:0' # Example for Claude Sonnet on Bedrock
+          agent_model: 'bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0' # Example for Claude Sonnet on Bedrock
           
           # Experimental: Google Gemini Pro
           # agent_model: 'gemini/gemini-2.5-pro-preview-05-06' # Check LiteLLM docs for exact model string
