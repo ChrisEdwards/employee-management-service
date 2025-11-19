@@ -82,4 +82,28 @@ public class EmployeeServiceSecurityTest {
     assertThat(users.size()).isEqualTo(1);
     assertThat(users.get(0).getUsername()).isEqualTo("test@user");
   }
+
+  @Test
+  public void testSqlInjectionPrevention_UnionAttack() throws SQLException {
+    // Test with UNION-based SQL injection attempt
+    String unionAttack = "admin' UNION SELECT * FROM users--";
+
+    employeeService.findUserByUsername(unionAttack);
+
+    // Verify that the PreparedStatement was used with parameterization
+    verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
+    verify(preparedStatement).setString(1, unionAttack);
+  }
+
+  @Test
+  public void testSqlInjectionPrevention_CommentAttack() throws SQLException {
+    // Test with comment-based SQL injection attempt
+    String commentAttack = "admin'--";
+
+    employeeService.findUserByUsername(commentAttack);
+
+    // Verify that the PreparedStatement was used with parameterization
+    verify(connection).prepareStatement("SELECT * FROM users WHERE username = ?");
+    verify(preparedStatement).setString(1, commentAttack);
+  }
 }

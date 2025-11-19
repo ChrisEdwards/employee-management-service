@@ -83,4 +83,19 @@ public class EmployeeControllerTest {
         .andExpect(status().isOk())
         .andExpect(content().string(containsString(mockResponse)));
   }
+
+  @Test
+  public void testUserSearchWithSqlInjectionAttempt() throws Exception {
+    // Setup - simulate SQL injection attempt
+    String sqlInjectionAttempt = "' OR '1'='1";
+    when(employeeService.findUserByUsername(sqlInjectionAttempt)).thenReturn(Arrays.asList());
+
+    // Test - the endpoint should handle the malicious input safely
+    mockMvc
+        .perform(
+            get("/api/user-search")
+                .param("username", sqlInjectionAttempt)
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
+  }
 }
