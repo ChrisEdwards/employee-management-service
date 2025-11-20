@@ -64,7 +64,7 @@ jobs:
 
           # Claude Via AWS Bedrock
           # Setup AWS credentials in the earlier "Configure AWS Credentials" step.
-          agent_model: 'bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0' # Example for Claude Sonnet on Bedrock
+          agent_model: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0' # Example for Claude Sonnet on Bedrock
           aws_bearer_token_bedrock: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
           aws_region: 'us-east-2'
           
