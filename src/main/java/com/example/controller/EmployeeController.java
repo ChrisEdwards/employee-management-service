@@ -39,13 +39,21 @@ public class EmployeeController {
 
   @GetMapping("/redirect")
   public ResponseEntity<String> redirectExample(@RequestParam String url) {
+    String sanitizedUrl = sanitizeHeaderValue(url);
     HttpHeaders headers = new HttpHeaders();
 
-    headers.add("Location", url);
+    headers.add("Location", sanitizedUrl);
 
-    headers.add("X-Custom-Header", "Referrer: " + url);
+    headers.add("X-Custom-Header", "Referrer: " + sanitizedUrl);
 
-    return new ResponseEntity<>("Redirecting to: " + url, headers, HttpStatus.FOUND);
+    return new ResponseEntity<>("Redirecting to: " + sanitizedUrl, headers, HttpStatus.FOUND);
+  }
+
+  private String sanitizeHeaderValue(String value) {
+    if (value == null) {
+      return "";
+    }
+    return value.replaceAll("[\\r\\n]", "");
   }
 
   @PostMapping("/update-account")
