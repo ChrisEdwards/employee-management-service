@@ -52,7 +52,7 @@ jobs:
           max_open_prs: 2 # This is the maximum limit for the number of PRs that SmartFix will have open at single time
 
           # Contrast-Provided LLM
-          use_contrast_llm: true
+          #use_contrast_llm: true
           
           # LLM Configuration (Bring Your Own LLM)
           # Choose ONE LLM provider and configure its credentials
@@ -64,9 +64,9 @@ jobs:
 
           # Claude Via AWS Bedrock
           # Setup AWS credentials in the earlier "Configure AWS Credentials" step.
-          #agent_model: 'bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0' # Example for Claude Sonnet on Bedrock
-          #aws_bearer_token_bedrock: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
-          #aws_region: 'us-east-2'
+          agent_model: 'bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0' # Example for Claude Sonnet on Bedrock
+          aws_bearer_token_bedrock: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
+          aws_region: 'us-east-2'
           
           # Experimental: Google Gemini Pro
           # agent_model: 'gemini/gemini-2.5-pro-preview-05-06' # Check LiteLLM docs for exact model string
