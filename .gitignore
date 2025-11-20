@@ -58,6 +58,14 @@ TestClass.class
 *.old
 webgoat.gitconfig
 contrast_security.yaml
+contrast_scan.yaml
 contrast-agent-4.10.0.jar
+.env
+CONTRAST_QUICK_START.md
+CONTRAST_SCAN_SETUP.md
+CONTRAST_SETUP.md
+contrast_scan.yaml.example
+run-with-contrast.sh
+scan-with-contrast.sh
 #ignore compiled smartfix files
 .github/actions/contrast-ai-smartfix/**/*.pyc
