@@ -43,8 +43,8 @@ public class EmployeeServiceTest {
 
     // Configure the mock DataSource
     when(dataSource.getConnection()).thenReturn(connection);
-    when(connection.createStatement()).thenReturn(statement);
-    when(statement.executeQuery(anyString())).thenReturn(resultSet);
+    when(connection.prepareStatement(anyString())).thenReturn(statement);
+    when(statement.executeQuery()).thenReturn(resultSet);
 
     // Mock the ResultSet to return no results by default
     when(resultSet.next()).thenReturn(false);
